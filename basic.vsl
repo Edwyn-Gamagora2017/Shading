@@ -1,0 +1,28 @@
+#version 330
+
+layout(location=0) in vec3 position;
+layout(location=3) in vec3 normal;
+
+//layout(binding=2) uniform sampler2D tex;
+
+uniform vec2 factor;
+uniform mat4x4 persp;
+
+out vec3 pos;
+out vec3 posOrig;
+out vec3 norm;
+
+void main()
+{
+    //gl_Position = vec4(position.xy*factor, position.z, 1);
+    //pos = vec3(position.xy*factor, position.z);
+
+	vec4 resPerspec = persp*vec4(position.xy, position.z, 1);
+	vec3 resFinal = vec3(resPerspec.xy*factor/resPerspec[3], resPerspec.z/resPerspec[3]);
+	gl_Position = vec4(resFinal, 1);
+	pos = resFinal;
+
+	posOrig = position;
+	norm = normal;
+}
+

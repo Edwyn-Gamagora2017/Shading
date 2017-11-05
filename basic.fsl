@@ -1,0 +1,32 @@
+#version 330
+
+in vec3 pos;
+in vec3 posOrig;
+in vec3 norm;
+
+uniform vec3 color;
+uniform vec4 light;
+
+//layout(binding=2) uniform sampler2D tex;
+uniform sampler2D tex;
+
+out vec4 color_out;
+
+void main()
+{
+	//color_out = vec4(pos.xyz, 1.0);
+	//color_out = vec4(vec3(1,0,0), 1.0);
+	//color_out = vec4(color*pos, 1.0);
+
+	vec3 toLight = light.xyz-posOrig;
+	float distance = length(toLight);
+	float lightValue = dot( normalize(toLight), norm )/(distance*distance);
+
+	vec2 uv = vec2( posOrig.x,posOrig.z );
+	color_out = texture(tex, uv)*(lightValue+0.3)*light[3];
+
+	//texture(tex, uv);
+
+	//float distance = distance( light, pos );
+	//float lightValue = dot( normalize(toLight), normalize(norm) )/(distance*distance);
+}

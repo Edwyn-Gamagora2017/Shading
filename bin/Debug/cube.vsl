@@ -1,0 +1,25 @@
+#version 330
+
+layout(location=0) in vec3 position;
+layout(location=1) in vec3 normal;
+layout(location=2) in vec2 uv;
+
+uniform mat4x4 modelTransf;
+uniform mat4x4 pvTransf;
+
+out vec3 pos;
+out vec2 uvTex;
+out vec3 norm;
+
+void main()
+{
+	//vec4 resTransf = pvTransf*vec4(position.xyz, 1);
+	vec4 resTransf = pvTransf*modelTransf*vec4(position.xyz, 1);
+	vec3 resFinal = vec3(resTransf.xyz/resTransf[3]);
+
+	gl_Position = vec4(resFinal, 1);
+	pos = resFinal;
+	uvTex = uv;
+	norm = normal;
+}
+
