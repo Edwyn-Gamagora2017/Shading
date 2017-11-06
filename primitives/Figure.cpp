@@ -31,6 +31,7 @@ size_t Figure::GetnTriangles() { return nTriangles; }
 Texture Figure::Gettexture() { return texture; }
 GLenum Figure::GettextureIndex() { return textureIndex; }
 GLuint Figure::GetvertexBuffer() { return vertexBuffer; }
+bool Figure::GetIsMirror(){ return this->isMirror; }
 
 void Figure::setTranslation(glm::tvec3<float> translation){ this->translation = translation; this->calculateModeTransf(); }
 void Figure::setRotation(glm::tvec3<float> rotation){ this->rotation = rotation; this->calculateModeTransf(); }

@@ -28,7 +28,7 @@ GLuint program;
 GLuint frameBuffer;
 Texture frameTexture, wallTexture, floorTexture;
 bool monkey = false;
-bool captureFrame = true;
+bool captureFrame = false;
 std::vector<Figure *> figures;
 
 void initTexture(texImage textureValues, Texture * texture)
@@ -83,104 +83,98 @@ void init()
     }
     else{
         // Cube
-        figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+        figures.push_back( new Figure( cube(1, 1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         // Floor
-        figures.push_back( new Figure( square(1, 1), false, glm::tvec3<float>(0.,-0.5,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(3.), program, floorTexture, GL_TEXTURE2 ) );
+        //figures.push_back( new Figure( square(1, 1), true, glm::tvec3<float>(0.,-1,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(3.), program, floorTexture, GL_TEXTURE2 ) );
     }
 }
 
 double itMov = 0;
-bool writingBuffer = true;
-void render(const int width, const int height)
+float cameraRatio = 1.;
+float cameraDistance = 2;
+glm::vec3 cameraPosition = glm::vec3(0, 1, cameraDistance);
+glm::vec3 cameraUp = glm::vec3(0, -1, 0);
+glm::vec4 lightPosition = glm::vec4(1, 1, 1, 2);
+float cameraFovV = 30.;
+float cameraNearV = 1.;
+float cameraFarV = cameraDistance*3;
+glm::vec3 cameraTargetPosition = glm::vec3(0, 0, 0);
+
+void render(const int width, const int height, GLuint bufferToRender )
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, bufferToRender);
+    glViewport(0, 0, width, height);
+
     // reseting buffers
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(1, 1, 1, 0);
     glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    // standard values
-        // Color
-    float color = 0.3f;
-        // Window resize
-    float cameraRatio = 1.;
-        // Perspective and Camera and Light
-    float distCamera;
-    glm::vec3 cameraPosition, cameraUp;
-    glm::vec4 lightPosition;
+    // Rotate camera
     itMov = itMov + 1;
     if (itMov > 360) itMov -= 360;
-    if(monkey)
-    {
-        // monkey
-        distCamera = 3;
-        cameraPosition = glm::vec3(cos(itMov*PI / 180)*distCamera, sin(itMov*PI / 180)*distCamera, 0);
-        //cameraP = glm::vec3(0, -distCamera, 0);
-        cameraUp = glm::vec3(0, 0, -1);
-        lightPosition = glm::vec4(0, 2, 2, 10);
-    }
-    else
-    {
-        // square
-        distCamera = 2;
-        cameraPosition = glm::vec3(0, 0, distCamera);
-        //cameraPosition = glm::vec3(cos(itMov*PI / 180)*distCamera, 1, sin(itMov*PI / 180)*distCamera);
-        cameraUp = glm::vec3(0, -1, 0);
-        lightPosition = glm::vec4(1, 1, 1, 2);
-    }
-    float cameraFovV = 30.;
-    float cameraNearV = 1.;
-    float cameraFarV = distCamera*3;
-    glm::vec3 objectPosition(0, 0, 0);
+    //cameraPosition = glm::vec3(cos(itMov*PI / 180)*cameraDistance, 1, sin(itMov*PI / 180)*cameraDistance);
+
     glm::tmat4x4<GLfloat> cameraProjectionMatrix = glm::perspective<GLfloat>(cameraFovV, cameraRatio, cameraNearV, cameraFarV);
-    glm::tmat4x4<GLfloat, glm::precision::packed_highp> cameraLookAtMatrix = glm::lookAt<GLfloat, glm::precision::packed_highp>(cameraPosition, objectPosition, cameraUp);
+    glm::tmat4x4<GLfloat, glm::precision::packed_highp> cameraLookAtMatrix = glm::lookAt<GLfloat, glm::precision::packed_highp>(cameraPosition, cameraTargetPosition, cameraUp);
     glm::tmat4x4<GLfloat> cameraPVMatrix = cameraProjectionMatrix*cameraLookAtMatrix;
+
     // objects
     FOR(j,figures.size()){
-        for (int i = 0; i < (captureFrame?2:1); i++)
-        {
-            glUseProgram(figures[j]->Getprogram());
-            //if(captureFrame){
-                if (writingBuffer)
-                {
-                    figures[j]->SetTexture( wallTexture );
-                    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-                    glViewport(0, 0, frameTexture.width, frameTexture.height);
+        glUseProgram(figures[j]->Getprogram());
 
-                    // ViewPerspective
-                    glm::tmat4x4<GLfloat> objectProjectionMatrix = glm::perspective<GLfloat>(cameraFovV, cameraRatio, cameraNearV, cameraFarV);
-                    glm::tmat4x4<GLfloat, glm::precision::packed_highp> objectLookAtMatrix = glm::lookAt<GLfloat, glm::precision::packed_highp>(lightPosition, objectPosition, cameraUp);
-                    glm::tmat4x4<GLfloat> objectPVMatrix = objectProjectionMatrix*objectLookAtMatrix;
-                    int itPersp = glGetUniformLocation(figures[j]->Getprogram(), "pvTransf");
-                    glUniformMatrix4fv(itPersp, 1, false, &(objectPVMatrix[0][0]));
-                }
-                else {
-                    figures[j]->SetTexture( frameTexture );
-                    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                    glViewport(0, 0, width, height);
+        /*if( figures[j]->GetIsMirror() ){
+            glEnable(GL_STENCIL_TEST);
+            glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+            glStencilMask(0xFF); // Write to stencil buffer
+            glDepthMask(GL_FALSE); // Don't write to depth buffer
+            glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
 
-                    // ViewPerspective
-                    int itPersp = glGetUniformLocation(figures[j]->Getprogram(), "pvTransf");
-                    glUniformMatrix4fv(itPersp, 1, false, &(cameraPVMatrix[0][0]));
-                }
-                writingBuffer = !writingBuffer;
-            //}
+            // Draw Mirror Content
+            glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
+            glStencilMask(0x00); // Don't write anything to stencil buffer
+            glDepthMask(GL_TRUE); // Write to depth buffer
 
-            // Uniforms
-            // TEXTURE
-            int itTex = glGetUniformLocation(figures[j]->Getprogram(), "tex");
-            glUniform1i(itTex, 2);
 
-            // Light
-            int itLight = glGetUniformLocation(figures[j]->Getprogram(), "light");
-            glUniform4f(itLight, lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
 
-            figures[j]->draw();
-
-            glUseProgram(0);
+            glDisable(GL_STENCIL_TEST);
+        }*/
+        if( figures[j]->GetIsMirror() ){
+            if ( bufferToRender == 0 ){
+                render( frameTexture.width, frameTexture.height, frameBuffer );
+                //figures[j]->SetTexture( frameTexture );
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                glViewport(0, 0, width, height);
+                //figures[j]->SetTexture( wallTexture );
+            }
         }
+
+        // Uniforms
+        // ViewPerspective
+        int itPersp = glGetUniformLocation(figures[j]->Getprogram(), "pvTransf");
+        glUniformMatrix4fv(itPersp, 1, false, &(cameraPVMatrix[0][0]));
+
+        // TEXTURE
+        int itTex = glGetUniformLocation(figures[j]->Getprogram(), "tex");
+        glUniform1i(itTex, 2);
+
+        // Light
+        int itLight = glGetUniformLocation(figures[j]->Getprogram(), "light");
+        glUniform4f(itLight, lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
+
+        figures[j]->draw();
+
+        glUseProgram(0);
 	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_DEPTH_TEST);
+}
+
+void render(const int width, const int height){
+std::cout << "render" << std::endl;
+    render( width, height, 0 );
 }
 
 int main(void)

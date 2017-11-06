@@ -33,6 +33,7 @@ class Figure
         Texture Gettexture();
         GLenum GettextureIndex();
         GLuint GetvertexBuffer();
+        bool GetIsMirror();
         void SetTexture( const Texture &tex );
 
         void setTranslation(glm::tvec3<float> translation);
