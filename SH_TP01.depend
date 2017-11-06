@@ -1117,15 +1117,15 @@
 
 1502882124 c:\users\eddossan\documents\github\glm-0.9.8.5\glm\gtx\transform.inl
 
-1509964113 source:c:\users\eddossan\documents\github\shading\primitives\figure.cpp
+1509982610 source:c:\users\eddossan\documents\github\shading\primitives\figure.cpp
 	"Figure.h"
 	<iostream>
 
-1509956346 c:\users\eddossan\documents\github\shading\primitives\figure.h
+1509982560 c:\users\eddossan\documents\github\shading\primitives\figure.h
 	"../library.h"
 	<string>
 
-1509966735 source:c:\users\eddossan\documents\github\shading\main.cpp
+1509983059 source:c:\users\eddossan\documents\github\shading\main.cpp
 	<iostream>
 	<fstream>
 	<sstream>

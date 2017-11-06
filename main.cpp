@@ -28,7 +28,7 @@ GLuint program;
 GLuint frameBuffer;
 Texture frameTexture, wallTexture, floorTexture;
 bool monkey = false;
-bool captureFrame = false;
+bool captureFrame = true;
 std::vector<Figure *> figures;
 
 void initTexture(texImage textureValues, Texture * texture)
@@ -79,13 +79,13 @@ void init()
         FOR(i,trisMonkey.size())
             FOR(j,3)
                 trisMonkey[i].pn[j].uv = glm::vec2(trisMonkey[i].pn[j].p.x,trisMonkey[i].pn[j].p.z);
-        figures.push_back( new Figure( trisMonkey, glm::tvec3<float>(0,0,0), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+        figures.push_back( new Figure( trisMonkey, false, glm::tvec3<float>(0,0,0), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
     }
     else{
         // Cube
-        figures.push_back( new Figure( cube(1, 1, 1), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+        figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         // Floor
-        figures.push_back( new Figure( square(1, 1), glm::tvec3<float>(0.,-0.5,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(3.), program, floorTexture, GL_TEXTURE2 ) );
+        figures.push_back( new Figure( square(1, 1), false, glm::tvec3<float>(0.,-0.5,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(3.), program, floorTexture, GL_TEXTURE2 ) );
     }
 }
 
@@ -103,86 +103,77 @@ void render(const int width, const int height)
         // Color
     float color = 0.3f;
         // Window resize
-    float ratio = 1.;
-    ratio = width / (float)height;
-    /*if (width > height)
-    {
-        ratio = height / (float)width;
-        glUniform2f(l, ratio, 1);
-    }
-    else
-    {
-        ratio = width / (float)height;
-        glUniform2f(l, 1, ratio);
-    }*/
+    float cameraRatio = 1.;
         // Perspective and Camera and Light
     float distCamera;
-    glm::vec3 cameraP, cameraUp;
-    glm::vec4 lightP;
+    glm::vec3 cameraPosition, cameraUp;
+    glm::vec4 lightPosition;
     itMov = itMov + 1;
     if (itMov > 360) itMov -= 360;
     if(monkey)
     {
         // monkey
         distCamera = 3;
-        cameraP = glm::vec3(cos(itMov*PI / 180)*distCamera, sin(itMov*PI / 180)*distCamera, 0);
+        cameraPosition = glm::vec3(cos(itMov*PI / 180)*distCamera, sin(itMov*PI / 180)*distCamera, 0);
         //cameraP = glm::vec3(0, -distCamera, 0);
         cameraUp = glm::vec3(0, 0, -1);
-        lightP = glm::vec4(0, 2, 2, 10);
+        lightPosition = glm::vec4(0, 2, 2, 10);
     }
     else
     {
         // square
         distCamera = 2;
-        cameraP = glm::vec3(1, 1, distCamera);
-        cameraP = glm::vec3(cos(itMov*PI / 180)*distCamera, 0, sin(itMov*PI / 180)*distCamera);
+        cameraPosition = glm::vec3(0, 0, distCamera);
+        //cameraPosition = glm::vec3(cos(itMov*PI / 180)*distCamera, 1, sin(itMov*PI / 180)*distCamera);
         cameraUp = glm::vec3(0, -1, 0);
-        lightP = glm::vec4(1, 1, distCamera, 2);
+        lightPosition = glm::vec4(1, 1, 1, 2);
     }
-    float fovV = 30.;
-    float nearV = 1.;
-    float farV = distCamera*3;
-    glm::vec3 objectP(0, 0, 0);
-    glm::tmat4x4<GLfloat> perspM = glm::perspective<GLfloat>(fovV, ratio, nearV, farV);
-    glm::tmat4x4<GLfloat, glm::precision::packed_highp> lookAtM = glm::lookAt<GLfloat, glm::precision::packed_highp>(cameraP, objectP, cameraUp);
-    glm::tmat4x4<GLfloat> resM = perspM*lookAtM;
+    float cameraFovV = 30.;
+    float cameraNearV = 1.;
+    float cameraFarV = distCamera*3;
+    glm::vec3 objectPosition(0, 0, 0);
+    glm::tmat4x4<GLfloat> cameraProjectionMatrix = glm::perspective<GLfloat>(cameraFovV, cameraRatio, cameraNearV, cameraFarV);
+    glm::tmat4x4<GLfloat, glm::precision::packed_highp> cameraLookAtMatrix = glm::lookAt<GLfloat, glm::precision::packed_highp>(cameraPosition, objectPosition, cameraUp);
+    glm::tmat4x4<GLfloat> cameraPVMatrix = cameraProjectionMatrix*cameraLookAtMatrix;
     // objects
     FOR(j,figures.size()){
         for (int i = 0; i < (captureFrame?2:1); i++)
         {
-            if(captureFrame){
+            glUseProgram(figures[j]->Getprogram());
+            //if(captureFrame){
                 if (writingBuffer)
                 {
                     figures[j]->SetTexture( wallTexture );
                     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
                     glViewport(0, 0, frameTexture.width, frameTexture.height);
+
+                    // ViewPerspective
+                    glm::tmat4x4<GLfloat> objectProjectionMatrix = glm::perspective<GLfloat>(cameraFovV, cameraRatio, cameraNearV, cameraFarV);
+                    glm::tmat4x4<GLfloat, glm::precision::packed_highp> objectLookAtMatrix = glm::lookAt<GLfloat, glm::precision::packed_highp>(lightPosition, objectPosition, cameraUp);
+                    glm::tmat4x4<GLfloat> objectPVMatrix = objectProjectionMatrix*objectLookAtMatrix;
+                    int itPersp = glGetUniformLocation(figures[j]->Getprogram(), "pvTransf");
+                    glUniformMatrix4fv(itPersp, 1, false, &(objectPVMatrix[0][0]));
                 }
                 else {
                     figures[j]->SetTexture( frameTexture );
                     glBindFramebuffer(GL_FRAMEBUFFER, 0);
                     glViewport(0, 0, width, height);
+
+                    // ViewPerspective
+                    int itPersp = glGetUniformLocation(figures[j]->Getprogram(), "pvTransf");
+                    glUniformMatrix4fv(itPersp, 1, false, &(cameraPVMatrix[0][0]));
                 }
                 writingBuffer = !writingBuffer;
-            }
-
-            // TEST SETTEXTURE
-            /*if(writingBuffer) figures[j]->SetTexture(frameTexture);
-            if(!writingBuffer) figures[j]->SetTexture(wallTexture);
-            writingBuffer = !writingBuffer;*/
-            glUseProgram(figures[j]->Getprogram());
+            //}
 
             // Uniforms
             // TEXTURE
             int itTex = glGetUniformLocation(figures[j]->Getprogram(), "tex");
             glUniform1i(itTex, 2);
 
-            // ViewPerspective
-            int itPersp = glGetUniformLocation(figures[j]->Getprogram(), "pvTransf");
-            glUniformMatrix4fv(itPersp, 1, false, &(resM[0][0]));
-
             // Light
             int itLight = glGetUniformLocation(figures[j]->Getprogram(), "light");
-            glUniform4f(itLight, lightP.x, lightP.y, lightP.z, lightP.w);
+            glUniform4f(itLight, lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
 
             figures[j]->draw();
 
