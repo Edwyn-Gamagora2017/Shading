@@ -27,8 +27,8 @@
 GLuint program;
 GLuint frameBuffer;
 Texture frameTexture, wallTexture;
-bool monkey = true;
-bool captureFrame = true;
+bool monkey = false;
+bool captureFrame = false;
 std::vector<Figure *> figures;
 
 void initTexture(texImage textureValues, Texture * texture)
@@ -117,7 +117,7 @@ void render(const int width, const int height)
     float distCamera;
     glm::vec3 cameraP, cameraUp;
     glm::vec4 lightP;
-    itMov = itMov + .01;
+    itMov = itMov + 1;
     if (itMov > 360) itMov -= 360;
     if(monkey)
     {
@@ -132,8 +132,8 @@ void render(const int width, const int height)
     {
         // square
         distCamera = 2;
-        //cameraP = glm::vec3(cos(itMov*PI / 180)*distCamera, 0, sin(itMov*PI / 180)*distCamera);
         cameraP = glm::vec3(0, 0, -distCamera);
+        cameraP = glm::vec3(cos(itMov*PI / 180)*distCamera, 0, sin(itMov*PI / 180)*distCamera);
         cameraUp = glm::vec3(0, 1, 0);
         lightP = glm::vec4(1, 1, 1, 2);
     }

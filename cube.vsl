@@ -7,7 +7,7 @@ layout(location=2) in vec2 uv;
 uniform mat4x4 modelTransf;
 uniform mat4x4 pvTransf;
 
-out vec3 pos;
+out vec3 posOrig;
 out vec2 uvTex;
 out vec3 norm;
 
@@ -15,10 +15,9 @@ void main()
 {
 	//vec4 resTransf = pvTransf*vec4(position.xyz, 1);
 	vec4 resTransf = pvTransf*modelTransf*vec4(position.xyz, 1);
-	vec3 resFinal = vec3(resTransf.xyz/resTransf[3]);
 
-	gl_Position = vec4(resFinal, 1);
-	pos = resFinal;
+	gl_Position = resTransf;
+	posOrig = position;
 	uvTex = uv;
 	norm = normal;
 }

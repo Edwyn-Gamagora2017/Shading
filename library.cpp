@@ -215,18 +215,28 @@ Triangle triangle(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 uv1, glm::
 Triangle triangle(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3){
     return triangle(p1,p2,p3,glm::vec2(),glm::vec2(),glm::vec2());
 }
-std::vector<Triangle> square(float width, float height)
-{
-	std::vector<Triangle> tris;
+std::vector<Triangle> square(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 p4){
+    //2-3
+    //1-4
+    std::vector<Triangle> tris;
 	tris.push_back(triangle(
-                         glm::vec3(-width/2., -height/2., 0), glm::vec3(-width / 2., height / 2., 0), glm::vec3(width / 2., height / 2., 0),
+                         p1, p2, p3,
                          glm::vec2(0,0),glm::vec2(0,1),glm::vec2(1,1)
                          ));
 	tris.push_back(triangle(
-                         glm::vec3(-width / 2., -height / 2., 0), glm::vec3(width / 2., height / 2., 0), glm::vec3(width / 2., -height / 2., 0),
+                         p1, p3, p4,
                          glm::vec2(0,0),glm::vec2(1,1),glm::vec2(1,0)
                          ));
 	return tris;
+}
+std::vector<Triangle> square(float width, float height)
+{
+    glm::vec3 p1( -width / 2.,  -height / 2.,   0 );
+	glm::vec3 p2( -width / 2.,  height / 2.,    0 );
+	glm::vec3 p3( width / 2.,   height / 2.,    0 );
+	glm::vec3 p4( width / 2.,   -height / 2.,   0 );
+
+	return square( p1, p2, p3, p4 );
 }
 std::vector<Triangle> cube(float width, float height, float depth)
 {
@@ -246,34 +256,26 @@ std::vector<Triangle> cube(float width, float height, float depth)
 	glm::vec3 p6( -width / 2.,  height / 2.,    depth / 2. );
 	glm::vec3 p7( width / 2.,   height / 2.,    depth / 2. );
 	glm::vec3 p8( width / 2.,   -height / 2.,   depth / 2. );
-	// UV
-        // 2-3
-        // 1-4
-    glm::vec2 uv1( 0,0 );
-    glm::vec2 uv2( 0,1 );
-    glm::vec2 uv3( 1,1 );
-    glm::vec2 uv4( 1,0 );
+
     // Faces
         // Front
-	tris.push_back(triangle(p1,p2,p3,uv1,uv2,uv3));
-	tris.push_back(triangle(p1,p3,p4,uv1,uv3,uv4));
+    std::vector<Triangle> square1 = square( p1, p2, p3, p4 );
+    tris.insert( tris.end(), square1.begin(), square1.end() );
         // Back
-	tris.push_back(triangle(p8,p7,p6,uv1,uv2,uv3));
-	tris.push_back(triangle(p8,p6,p5,uv1,uv3,uv4));
+    std::vector<Triangle> square2 = square( p8, p7, p6, p5 );
+    tris.insert( tris.end(), square2.begin(), square2.end() );
         // Left
-	tris.push_back(triangle(p5,p6,p2,uv1,uv2,uv3));
-	tris.push_back(triangle(p5,p2,p1,uv1,uv3,uv4));
+    std::vector<Triangle> square3 = square( p5, p6, p2, p1 );
+    tris.insert( tris.end(), square3.begin(), square3.end() );
         // Right
-	tris.push_back(triangle(p4,p3,p7,uv1,uv2,uv3));
-	tris.push_back(triangle(p4,p7,p8,uv1,uv3,uv4));
-	/*tris.push_back(triangle(p8,p7,p3,uv1,uv2,uv3));
-	tris.push_back(triangle(p8,p3,p4,uv1,uv3,uv4));*/
+    std::vector<Triangle> square4 = square( p4, p3, p7, p8 );
+    tris.insert( tris.end(), square4.begin(), square4.end() );
         // Top
-	tris.push_back(triangle(p2,p6,p7,uv1,uv2,uv3));
-	tris.push_back(triangle(p2,p7,p3,uv1,uv3,uv4));
+    std::vector<Triangle> square5 = square( p2, p6, p7, p3 );
+    tris.insert( tris.end(), square5.begin(), square5.end() );
         // Bottom
-	tris.push_back(triangle(p8,p4,p1,uv1,uv2,uv3));
-	tris.push_back(triangle(p8,p1,p5,uv1,uv3,uv4));
+    std::vector<Triangle> square6 = square( p8, p4, p1, p5 );
+    tris.insert( tris.end(), square6.begin(), square6.end() );
 
 	return tris;
 }

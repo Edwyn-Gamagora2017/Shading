@@ -1,6 +1,6 @@
 #version 330
 
-in vec3 pos;
+in vec3 posOrig;
 in vec3 norm;
 in vec2 uvTex;
 
@@ -13,7 +13,7 @@ out vec4 color_out;
 
 void main()
 {
-	vec3 toLight = light.xyz-pos;
+	vec3 toLight = light.xyz-posOrig;
 	float distance = length(toLight);
 	float lightValue = dot( normalize(toLight), norm )/(distance*distance);
 	if(lightValue < 0.0) lightValue = 0.0;  // standard light
