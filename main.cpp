@@ -60,7 +60,7 @@ void initDepthTexture(int width, int height, Texture * texture)
 
     glGenTextures( 1, &(texture->tex) );
 	glBindTexture(GL_TEXTURE_2D, texture->tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture->width, texture->height, 0, GL_RGBA, GL_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, texture->width, texture->height, 0, GL_R32F, GL_FLOAT, nullptr);
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, texture->width, texture->height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -167,7 +167,7 @@ void render(const int width, const int height)
     glm::tmat4x4<GLfloat, glm::precision::packed_highp> lookAtCameraM = glm::lookAt<GLfloat, glm::precision::packed_highp>(cameraPosition, objectPosition, cameraUp);
     glm::tmat4x4<GLfloat, glm::precision::packed_highp> lookAtDepthM = glm::lookAt<GLfloat, glm::precision::packed_highp>(lightPosition, objectPosition, glm::vec3(0,1,0));
     glm::tmat4x4<GLfloat> cameraTransformationMatrix = perspCameraMatrix*lookAtCameraM;
-    glm::tmat4x4<GLfloat> depthTransformationMatrix = perspCameraMatrix*lookAtDepthM;
+    glm::tmat4x4<GLfloat> depthTransformationMatrix = perspCameraMatrix*lookAtCameraM;//perspCameraMatrix*lookAtDepthM;
 
     // objects
     FOR(j,figures.size()){

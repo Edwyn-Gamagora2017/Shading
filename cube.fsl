@@ -26,6 +26,6 @@ void main()
         color_out = texture(tex, uv);//*lightValue*light.w;           // color = texture * lightValue * lightIntensity
 	}
 	else{
-        color_out = vec4(distance/depthMax,0,0,1);
+        color_out = vec4(distance);
 	}
 }
