@@ -18,7 +18,7 @@ class Figure
         static const int textureUVPosition = 2;
 
         /** Default constructor */
-        Figure( std::vector<Triangle> triangles, glm::tvec3<float> translation, glm::tvec3<float> rotation, glm::tvec3<float> scale, GLuint program, Texture const &texture, GLenum textureIndex );
+        Figure( std::vector<Triangle> triangles, bool isMirror, glm::tvec3<float> translation, glm::tvec3<float> rotation, glm::tvec3<float> scale, GLuint program, Texture const &texture, GLenum textureIndex );
         /** Default destructor */
         virtual ~Figure();
         /** Assignment operator
@@ -51,6 +51,7 @@ class Figure
         glm::tvec3<float> rotation;
         glm::tvec3<float> scale;
         glm::tmat4x4<float> modelTransf;
+        bool isMirror;
 
         GLuint program; //!< Member variable "program"
         GLuint vertexArray; //!< Member variable "vertexArray"

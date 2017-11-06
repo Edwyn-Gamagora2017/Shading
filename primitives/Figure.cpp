@@ -1,8 +1,11 @@
 #include "Figure.h"
 #include <iostream>
 
-Figure::Figure( std::vector<Triangle> triangles, glm::tvec3<float> translation, glm::tvec3<float> rotation, glm::tvec3<float> scale, GLuint program, Texture const &texture, GLenum textureIndex )
+Figure::Figure( std::vector<Triangle> triangles, bool isMirror, glm::tvec3<float> translation, glm::tvec3<float> rotation, glm::tvec3<float> scale, GLuint program, Texture const &texture, GLenum textureIndex )
 {
+    /* GENERAL DATA */
+    this->isMirror = isMirror;
+
     /* VERTICES, NORMALS */
     this->triangles = triangles;
     this->nTriangles = triangles.size();
