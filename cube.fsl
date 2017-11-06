@@ -6,6 +6,9 @@ in vec2 uvTex;
 
 uniform vec4 light;
 
+uniform int depthIteration;     // 1 : this render iteration is concerned on obtaining the depth map; 0 : this render iteration is concerned on drawing the texture;
+uniform float depthMax;         // the 'far' value for the depth ProjView matrix
+
 //layout(binding=2) uniform sampler2D tex;
 uniform sampler2D tex;
 
@@ -18,6 +21,11 @@ void main()
 	float lightValue = dot( normalize(toLight), norm )/(distance*distance);
 	if(lightValue < 0.0) lightValue = 0.0; // standard light : if the normal is in the opposite side
 
-	vec2 uv = vec2( uvTex.x, uvTex.y );
-	color_out = texture(tex, uv)*lightValue*light.w;           // color = texture * lightValue * lightIntensity
+	if( depthIteration == 0 ){
+        vec2 uv = vec2( uvTex.x, uvTex.y );
+        color_out = texture(tex, uv);//*lightValue*light.w;           // color = texture * lightValue * lightIntensity
+	}
+	else{
+        color_out = vec4(distance/depthMax,0,0,1);
+	}
 }

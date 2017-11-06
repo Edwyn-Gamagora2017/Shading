@@ -4,8 +4,9 @@ layout(location=0) in vec3 position;
 layout(location=1) in vec3 normal;
 layout(location=2) in vec2 uv;
 
-uniform mat4x4 modelTransf;
-uniform mat4x4 pvTransf;
+uniform mat4x4 modelTransf;     // Transformation for model
+uniform mat4x4 pvTransf;        // Transformation for camera. It is the transformation for the depth when we are trying to get Depth
+uniform mat4x4 depthTransf;     // Transformation for depth
 
 out vec3 posOrig;
 out vec3 norm;
