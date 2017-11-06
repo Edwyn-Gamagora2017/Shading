@@ -8,17 +8,21 @@ uniform mat4x4 modelTransf;
 uniform mat4x4 pvTransf;
 
 out vec3 posOrig;
-out vec2 uvTex;
 out vec3 norm;
+out vec2 uvTex;
 
 void main()
 {
-	//vec4 resTransf = pvTransf*vec4(position.xyz, 1);
-	vec4 resTransf = pvTransf*modelTransf*vec4(position.xyz, 1);
+    // the position and the normal are modified by the model transformation
+    vec4 posModel = modelTransf*vec4(position.xyz, 1);
+    vec4 normalModel = modelTransf*vec4(normal.xyz, 1);
 
-	gl_Position = resTransf;
-	posOrig = position;
+    // only the position is modified by the projectionView transformation
+	vec4 posProjView = pvTransf*posModel;
+
+	gl_Position = posProjView;
+	posOrig = posModel.xyz;
+	norm = normalModel.xyz;
 	uvTex = uv;
-	norm = normal;
 }
 

@@ -603,7 +603,7 @@
 	<inttypes.h>
 	<stdint.h>
 
-1509961134 source:c:\users\eddossan\documents\github\shading\library.cpp
+1509966859 source:c:\users\eddossan\documents\github\shading\library.cpp
 	"library.h"
 	<iostream>
 	<fstream>
@@ -611,13 +611,14 @@
 	<vector>
 	<set>
 	<cstdlib>
+	<cmath>
 	<glad/glad.h>
 	<glm/gtc/matrix_transform.hpp>
 	<glm/glm.hpp>
 	<glm/gtx/transform.hpp>
 	<GLFW/glfw3.h>
 
-1509956346 c:\users\eddossan\documents\github\shading\library.h
+1509962779 c:\users\eddossan\documents\github\shading\library.h
 	<vector>
 	<string>
 	<glad/glad.h>
@@ -1116,7 +1117,7 @@
 
 1502882124 c:\users\eddossan\documents\github\glm-0.9.8.5\glm\gtx\transform.inl
 
-1509956346 source:c:\users\eddossan\documents\github\shading\primitives\figure.cpp
+1509964113 source:c:\users\eddossan\documents\github\shading\primitives\figure.cpp
 	"Figure.h"
 	<iostream>
 
@@ -1124,7 +1125,7 @@
 	"../library.h"
 	<string>
 
-1509962280 source:c:\users\eddossan\documents\github\shading\main.cpp
+1509966735 source:c:\users\eddossan\documents\github\shading\main.cpp
 	<iostream>
 	<fstream>
 	<sstream>

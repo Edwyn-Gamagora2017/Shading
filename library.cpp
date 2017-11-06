@@ -1,11 +1,14 @@
 #include "library.h"
 
+#define _USE_MATH_DEFINES
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <set>
 #include <cstdlib>
+#include <cmath>
 
 #include <glad/glad.h>
 
@@ -18,6 +21,8 @@
 #define glInfo(a) std::cout << #a << ": " << glGetString(a) << std::endl
 
 #define FOR(i,a) for(int i=0; i<a; i++)
+
+#define PI 3.1415926535897
 
 std::set<std::string> messages;
 
@@ -245,17 +250,17 @@ std::vector<Triangle> cube(float width, float height, float depth)
         // Front
         //2-3
         //1-4
-	glm::vec3 p1( -width / 2.,  -height / 2.,   -depth / 2. );
-	glm::vec3 p2( -width / 2.,  height / 2.,    -depth / 2. );
-	glm::vec3 p3( width / 2.,   height / 2.,    -depth / 2. );
-	glm::vec3 p4( width / 2.,   -height / 2.,   -depth / 2. );
+	glm::vec3 p1( -width / 2.,  -height / 2.,   depth / 2. );
+	glm::vec3 p2( -width / 2.,  height / 2.,    depth / 2. );
+	glm::vec3 p3( width / 2.,   height / 2.,    depth / 2. );
+	glm::vec3 p4( width / 2.,   -height / 2.,   depth / 2. );
         // Back
         //6-7
         //5-8
-	glm::vec3 p5( -width / 2.,  -height / 2.,   depth / 2. );
-	glm::vec3 p6( -width / 2.,  height / 2.,    depth / 2. );
-	glm::vec3 p7( width / 2.,   height / 2.,    depth / 2. );
-	glm::vec3 p8( width / 2.,   -height / 2.,   depth / 2. );
+    glm::vec3 p5( -width / 2.,  -height / 2.,   -depth / 2. );
+	glm::vec3 p6( -width / 2.,  height / 2.,    -depth / 2. );
+	glm::vec3 p7( width / 2.,   height / 2.,    -depth / 2. );
+	glm::vec3 p8( width / 2.,   -height / 2.,   -depth / 2. );
 
     // Faces
         // Front
@@ -392,4 +397,7 @@ std::string floatToStr( float value ){
 std::string vecToString( glm::vec3 v )
 {
     return floatToStr(v.x)+" "+floatToStr(v.y)+" "+floatToStr(v.z);
+}
+float degreesToRadians( float degrees ){
+    return (degrees * 2 * PI / 360.f);
 }

@@ -26,7 +26,7 @@
 
 GLuint program;
 GLuint frameBuffer;
-Texture frameTexture, wallTexture;
+Texture frameTexture, wallTexture, floorTexture;
 bool monkey = false;
 bool captureFrame = false;
 std::vector<Figure *> figures;
@@ -61,6 +61,7 @@ void init()
 
 	// TEXTURE
     initTexture( readPPM("texture-arrow"), &wallTexture );
+    initTexture( singleColor(10,10,1,1,0), &floorTexture );
     initTexture( singleColor(200,200,1,0,0), &frameTexture );
 	// END TEXTURE
 
@@ -81,9 +82,10 @@ void init()
         figures.push_back( new Figure( trisMonkey, glm::tvec3<float>(0,0,0), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
     }
     else{
-        // Create Square and Cube
-        figures.push_back( new Figure( square(1, 1), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
-        figures.push_back( new Figure( cube(1, 1, 1), glm::tvec3<float>(1.,1.,1.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+        // Cube
+        figures.push_back( new Figure( cube(1, 1, 1), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+        // Floor
+        figures.push_back( new Figure( square(1, 1), glm::tvec3<float>(0.,-0.5,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(3.), program, floorTexture, GL_TEXTURE2 ) );
     }
 }
 
@@ -132,10 +134,10 @@ void render(const int width, const int height)
     {
         // square
         distCamera = 2;
-        cameraP = glm::vec3(0, 0, -distCamera);
+        cameraP = glm::vec3(1, 1, distCamera);
         cameraP = glm::vec3(cos(itMov*PI / 180)*distCamera, 0, sin(itMov*PI / 180)*distCamera);
-        cameraUp = glm::vec3(0, 1, 0);
-        lightP = glm::vec4(1, 1, 1, 2);
+        cameraUp = glm::vec3(0, -1, 0);
+        lightP = glm::vec4(1, 1, distCamera, 2);
     }
     float fovV = 30.;
     float nearV = 1.;

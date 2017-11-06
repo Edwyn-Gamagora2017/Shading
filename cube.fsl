@@ -16,7 +16,7 @@ void main()
 	vec3 toLight = light.xyz-posOrig;
 	float distance = length(toLight);
 	float lightValue = dot( normalize(toLight), norm )/(distance*distance);
-	if(lightValue < 0.0) lightValue = 0.0;  // standard light
+	if(lightValue < 0.0) lightValue = 0.0; // standard light : if the normal is in the opposite side
 
 	vec2 uv = vec2( uvTex.x, uvTex.y );
 	color_out = texture(tex, uv)*lightValue*light.w;           // color = texture * lightValue * lightIntensity

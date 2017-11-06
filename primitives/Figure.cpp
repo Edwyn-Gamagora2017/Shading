@@ -115,9 +115,9 @@ void Figure::calculateModeTransf()
 {
     glm::tmat4x4<float> identityMatrix      = glm::tmat4x4<float>(1.);
     glm::tmat4x4<float> translationTransf   = glm::translate(identityMatrix, this->translation);
-    glm::tmat4x4<float> rotationTransfX     = glm::rotate(identityMatrix, this->rotation.x, glm::vec3(1.,0.,0.));
-    glm::tmat4x4<float> rotationTransfY     = glm::rotate(identityMatrix, this->rotation.y, glm::vec3(0.,1.,0.));
-    glm::tmat4x4<float> rotationTransfZ     = glm::rotate(identityMatrix, this->rotation.z, glm::vec3(0.,0.,1.));
+    glm::tmat4x4<float> rotationTransfX     = glm::rotate(identityMatrix, degreesToRadians(this->rotation.x), glm::vec3(1.,0.,0.));
+    glm::tmat4x4<float> rotationTransfY     = glm::rotate(identityMatrix, degreesToRadians(this->rotation.y), glm::vec3(0.,1.,0.));
+    glm::tmat4x4<float> rotationTransfZ     = glm::rotate(identityMatrix, degreesToRadians(this->rotation.z), glm::vec3(0.,0.,1.));
     glm::tmat4x4<float> scaleTransf         = glm::scale(identityMatrix, this->scale);
     this->modelTransf = translationTransf*rotationTransfX*rotationTransfY*rotationTransfZ*scaleTransf;
 }

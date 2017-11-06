@@ -47,3 +47,4 @@ texImage singleColor(int width, int height, float r, float g, float b);
 void runGL(void (*init)(), void (*render)(const int width, const int height));
 
 std::string vecToString( glm::vec3 v );
+float degreesToRadians( float degrees );
