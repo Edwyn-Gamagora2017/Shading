@@ -138,8 +138,6 @@ void render(const int width, const int height, GLuint bufferToRender, int iterat
             glStencilMask(0x00); // Don't write anything to stencil buffer
             glDepthMask(GL_TRUE); // Write to depth buffer
 
-
-
             glDisable(GL_STENCIL_TEST);
         }*/
         if( figures[j]->GetIsMirror() ){
@@ -161,8 +159,8 @@ void render(const int width, const int height, GLuint bufferToRender, int iterat
         glUniformMatrix4fv(itPersp, 1, false, &(cameraPVMatrix[0][0]));
 
         // TEXTURE
-        int itTex = glGetUniformLocation(figures[j]->Getprogram(), "tex");
-        glUniform1i(itTex, 2);
+        /*int itTex = glGetUniformLocation(figures[j]->Getprogram(), "tex");
+        glUniform1i(itTex, 2);*/
 
         // Light
         int itLight = glGetUniformLocation(figures[j]->Getprogram(), "light");

@@ -603,7 +603,7 @@
 	<inttypes.h>
 	<stdint.h>
 
-1509966859 source:c:\users\eddossan\documents\github\shading\library.cpp
+1510050421 source:c:\users\eddossan\documents\github\shading\library.cpp
 	"library.h"
 	<iostream>
 	<fstream>
@@ -1125,7 +1125,7 @@
 	"../library.h"
 	<string>
 
-1510048877 source:c:\users\eddossan\documents\github\shading\main.cpp
+1510049991 source:c:\users\eddossan\documents\github\shading\main.cpp
 	<iostream>
 	<fstream>
 	<sstream>
@@ -1138,4 +1138,52 @@
 	<glm/glm.hpp>
 	<glm/gtx/transform.hpp>
 	"primitives/Figure.h"
+
+1510050206 c:\users\eddossan\documents\github\shading\glad4.0\include\glad\glad.h
+	<windows.h>
+	<stddef.h>
+	<KHR/khrplatform.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1510050206 c:\users\eddossan\documents\github\shading\glad4.0\include\khr\khrplatform.h
+	<stdint.h>
+	<inttypes.h>
+	<stdint.h>
+
+1510050206 source:c:\users\eddossan\documents\github\shading\glad4.0\src\glad.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<glad/glad.h>
+	<windows.h>
+	<dlfcn.h>
+
+1510050570 c:\users\eddossan\documents\github\shading\glad_gl4.3\include\glad\glad.h
+	<windows.h>
+	<stddef.h>
+	<KHR/khrplatform.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1510050570 c:\users\eddossan\documents\github\shading\glad_gl4.3\include\khr\khrplatform.h
+	<stdint.h>
+	<inttypes.h>
+	<stdint.h>
+
+1510050570 source:c:\users\eddossan\documents\github\shading\glad_gl4.3\src\glad.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<glad/glad.h>
+	<windows.h>
+	<dlfcn.h>
 

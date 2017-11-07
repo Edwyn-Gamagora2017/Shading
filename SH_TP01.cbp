@@ -38,7 +38,7 @@
 			<Add option="-fexceptions" />
 			<Add directory="../glfw-3.2.1.bin.WIN32/include" />
 			<Add directory="../glm-0.9.8.5" />
-			<Add directory="glad/include" />
+			<Add directory="glad_gl4.3/include" />
 		</Compiler>
 		<Linker>
 			<Add option="-lgdi32" />
@@ -50,7 +50,7 @@
 		<Unit filename="basic.vsl" />
 		<Unit filename="cube.fsl" />
 		<Unit filename="cube.vsl" />
-		<Unit filename="glad/src/glad.c">
+		<Unit filename="glad_gl4.3/src/glad.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="library.cpp" />
