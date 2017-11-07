@@ -82,8 +82,9 @@ void init()
         figures.push_back( new Figure( trisMonkey, false, glm::tvec3<float>(0,0,0), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
     }
     else{
+        figures.push_back( new Figure( square(1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         // Cube
-        figures.push_back( new Figure( cube(1, 1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+        //figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         // Floor
         //figures.push_back( new Figure( square(1, 1), true, glm::tvec3<float>(0.,-1,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(3.), program, floorTexture, GL_TEXTURE2 ) );
     }
@@ -92,7 +93,7 @@ void init()
 double itMov = 0;
 float cameraRatio = 1.;
 float cameraDistance = 2;
-glm::vec3 cameraPosition = glm::vec3(0, 1, cameraDistance);
+glm::vec3 cameraPosition = glm::vec3(0, 0, cameraDistance);
 glm::vec3 cameraUp = glm::vec3(0, -1, 0);
 glm::vec4 lightPosition = glm::vec4(1, 1, 1, 2);
 float cameraFovV = 30.;
@@ -100,16 +101,16 @@ float cameraNearV = 1.;
 float cameraFarV = cameraDistance*3;
 glm::vec3 cameraTargetPosition = glm::vec3(0, 0, 0);
 
-void render(const int width, const int height, GLuint bufferToRender )
+void render(const int width, const int height, GLuint bufferToRender, int iteration )
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, bufferToRender);
-    glViewport(0, 0, width, height);
-
     // reseting buffers
     glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(1, 1, 1, 0);
+    glClearColor(1, 1, 0, 0);
     glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, bufferToRender);
+    glViewport(0, 0, width, height);
 
     // Rotate camera
     itMov = itMov + 1;
@@ -142,11 +143,14 @@ void render(const int width, const int height, GLuint bufferToRender )
             glDisable(GL_STENCIL_TEST);
         }*/
         if( figures[j]->GetIsMirror() ){
-            if ( bufferToRender == 0 ){
-                render( frameTexture.width, frameTexture.height, frameBuffer );
+            if ( iteration == 0 ){
+                //figures[j]->SetTexture( wallTexture );
+                render( frameTexture.width, frameTexture.height, frameBuffer, iteration+1 );
                 //figures[j]->SetTexture( frameTexture );
-                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                glBindFramebuffer(GL_FRAMEBUFFER, bufferToRender);
                 glViewport(0, 0, width, height);
+            }
+            else{
                 //figures[j]->SetTexture( wallTexture );
             }
         }
@@ -174,7 +178,7 @@ void render(const int width, const int height, GLuint bufferToRender )
 
 void render(const int width, const int height){
 std::cout << "render" << std::endl;
-    render( width, height, 0 );
+    render( width, height, 0, 0 );
 }
 
 int main(void)
