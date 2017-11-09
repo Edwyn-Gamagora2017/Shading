@@ -1,4 +1,4 @@
-#version 330
+#version 430
 
 in vec3 posOrig;
 in vec3 norm;
@@ -6,8 +6,8 @@ in vec2 uvTex;
 
 uniform vec4 light;
 
-//layout(binding=2) uniform sampler2D tex;
-uniform sampler2D tex;
+layout(binding=2) uniform sampler2D tex;
+//uniform sampler2D tex;
 
 out vec4 color_out;
 
@@ -19,5 +19,5 @@ void main()
 	if(lightValue < 0.0) lightValue = 0.0; // standard light : if the normal is in the opposite side
 
 	vec2 uv = vec2( uvTex.x, uvTex.y );
-	color_out = texture(tex, uv)*lightValue*light.w;           // color = texture * lightValue * lightIntensity
+	color_out = texture(tex, uv);//*lightValue*light.w;           // color = texture * lightValue * lightIntensity
 }

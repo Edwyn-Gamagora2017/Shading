@@ -30,6 +30,7 @@ Texture frameTexture, wallTexture, floorTexture;
 bool monkey = false;
 bool captureFrame = false;
 std::vector<Figure *> figures;
+Figure * mirror;
 
 void initTexture(texImage textureValues, Texture * texture)
 {
@@ -61,7 +62,7 @@ void init()
 
 	// TEXTURE
     initTexture( readPPM("texture-arrow"), &wallTexture );
-    initTexture( singleColor(10,10,1,1,0), &floorTexture );
+    initTexture( singleColor(100,100,1,1,1), &floorTexture );
     initTexture( singleColor(200,200,1,0,0), &frameTexture );
 	// END TEXTURE
 
@@ -82,101 +83,96 @@ void init()
         figures.push_back( new Figure( trisMonkey, false, glm::tvec3<float>(0,0,0), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
     }
     else{
-        figures.push_back( new Figure( square(1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+        //figures.push_back( new Figure( square(1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         // Cube
-        //figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+        figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(0.,1.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+        figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(1.1,1.,0.), glm::tvec3<float>(45.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         // Floor
-        //figures.push_back( new Figure( square(1, 1), true, glm::tvec3<float>(0.,-1,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(3.), program, floorTexture, GL_TEXTURE2 ) );
+        mirror = new Figure( square(1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(3.), program, floorTexture, GL_TEXTURE2 );
     }
 }
 
 double itMov = 0;
 float cameraRatio = 1.;
 float cameraDistance = 2;
-glm::vec3 cameraPosition = glm::vec3(0, 0, cameraDistance);
+glm::vec3 cameraPosition = glm::vec3(0, 1, cameraDistance);
 glm::vec3 cameraUp = glm::vec3(0, -1, 0);
-glm::vec4 lightPosition = glm::vec4(1, 1, 1, 2);
+glm::vec4 lightPosition = glm::vec4(0., 1., 1.5, 4.);
 float cameraFovV = 30.;
 float cameraNearV = 1.;
 float cameraFarV = cameraDistance*3;
-glm::vec3 cameraTargetPosition = glm::vec3(0, 0, 0);
+glm::vec3 cameraTargetPosition = glm::vec3(0, 1, 0);
+glm::tmat4x4<GLfloat> identity = glm::tmat4x4<GLfloat>(1.);
 
-void render(const int width, const int height, GLuint bufferToRender, int iteration )
-{
+void render(const int width, const int height){
     // reseting buffers
     glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(1, 1, 0, 0);
+    glClearColor(1, 0, 0, 0);
     glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, bufferToRender);
+ //   glBindFramebuffer(GL_FRAMEBUFFER, bufferToRender);
     glViewport(0, 0, width, height);
 
     // Rotate camera
     itMov = itMov + 1;
     if (itMov > 360) itMov -= 360;
-    //cameraPosition = glm::vec3(cos(itMov*PI / 180)*cameraDistance, 1, sin(itMov*PI / 180)*cameraDistance);
+    //cameraPosition = glm::vec3(cos(itMov*PI / 180)*cameraDistance, 0, sin(itMov*PI / 180)*cameraDistance);
 
     glm::tmat4x4<GLfloat> cameraProjectionMatrix = glm::perspective<GLfloat>(cameraFovV, cameraRatio, cameraNearV, cameraFarV);
     glm::tmat4x4<GLfloat, glm::precision::packed_highp> cameraLookAtMatrix = glm::lookAt<GLfloat, glm::precision::packed_highp>(cameraPosition, cameraTargetPosition, cameraUp);
     glm::tmat4x4<GLfloat> cameraPVMatrix = cameraProjectionMatrix*cameraLookAtMatrix;
+    glm::tmat4x4<GLfloat> mirrorModelMatrix = mirror->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( mirror->getModelTransf() );
 
-    // objects
-    FOR(j,figures.size()){
-        glUseProgram(figures[j]->Getprogram());
+    glUseProgram( program );
 
-        /*if( figures[j]->GetIsMirror() ){
-            glEnable(GL_STENCIL_TEST);
-            glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
-            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            glStencilMask(0xFF); // Write to stencil buffer
-            glDepthMask(GL_FALSE); // Don't write to depth buffer
-            glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+    // Uniforms
+    // ViewPerspective
+    int itPersp = glGetUniformLocation(program, "pvTransf");
+    glUniformMatrix4fv(itPersp, 1, false, &(cameraPVMatrix[0][0]));
+    int itMirror = glGetUniformLocation(program, "mirrorModelTransf");
+    glUniformMatrix4fv(itMirror, 1, false, &(identity[0][0]));
 
-            // Draw Mirror Content
-            glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
-            glStencilMask(0x00); // Don't write anything to stencil buffer
-            glDepthMask(GL_TRUE); // Write to depth buffer
+    // TEXTURE
+    int itTex = glGetUniformLocation(program, "tex");
+    glUniform1i(itTex, 2);
 
-            glDisable(GL_STENCIL_TEST);
-        }*/
-        if( figures[j]->GetIsMirror() ){
-            if ( iteration == 0 ){
-                //figures[j]->SetTexture( wallTexture );
-                render( frameTexture.width, frameTexture.height, frameBuffer, iteration+1 );
-                //figures[j]->SetTexture( frameTexture );
-                glBindFramebuffer(GL_FRAMEBUFFER, bufferToRender);
-                glViewport(0, 0, width, height);
-            }
-            else{
-                //figures[j]->SetTexture( wallTexture );
-            }
-        }
+    // Light
+    int itLight = glGetUniformLocation(program, "lightInfo");
+    glUniform4f(itLight, lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
 
-        // Uniforms
-        // ViewPerspective
-        int itPersp = glGetUniformLocation(figures[j]->Getprogram(), "pvTransf");
-        glUniformMatrix4fv(itPersp, 1, false, &(cameraPVMatrix[0][0]));
+    // Render Main Camera
+    FOR(i,figures.size()){
+        figures[i]->draw();
+    }
 
-        // TEXTURE
-        /*int itTex = glGetUniformLocation(figures[j]->Getprogram(), "tex");
-        glUniform1i(itTex, 2);*/
+    // Render Stencil
+    glEnable(GL_STENCIL_TEST);
 
-        // Light
-        int itLight = glGetUniformLocation(figures[j]->Getprogram(), "light");
-        glUniform4f(itLight, lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
+    // Draw floor
+    glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilMask(0xFF); // Write to stencil buffer
+    glDepthMask(GL_FALSE); // Don't write to depth buffer
+    glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
 
-        figures[j]->draw();
+    mirror->draw();
 
-        glUseProgram(0);
-	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDisable(GL_DEPTH_TEST);
-}
+    glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
+    glStencilMask(0x00); // Don't write anything to stencil buffer
+    glDepthMask(GL_TRUE); // Write to depth buffer
 
-void render(const int width, const int height){
-std::cout << "render" << std::endl;
-    render( width, height, 0, 0 );
+    // Render Mirror Camera
+    glUniformMatrix4fv(itMirror, 1, false, &(mirrorModelMatrix[0][0]));
+    for(auto &f : figures)
+    {
+        f->draw();
+    }
+
+    glDisable(GL_STENCIL_TEST);
+
+    glUseProgram(0);
+    //glDisable(GL_DEPTH_TEST);
 }
 
 int main(void)

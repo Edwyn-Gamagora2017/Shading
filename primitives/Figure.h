@@ -63,6 +63,7 @@ class Figure
 
     private:
         void initPointersAndBuffers();
+        void bindPointersAndBuffers();
         void closePointersAndBuffers();
         void calculateModeTransf();
 };

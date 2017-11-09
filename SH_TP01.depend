@@ -603,7 +603,7 @@
 	<inttypes.h>
 	<stdint.h>
 
-1510050421 source:c:\users\eddossan\documents\github\shading\library.cpp
+1510250948 source:c:\users\eddossan\documents\github\shading\library.cpp
 	"library.h"
 	<iostream>
 	<fstream>
@@ -1117,15 +1117,15 @@
 
 1502882124 c:\users\eddossan\documents\github\glm-0.9.8.5\glm\gtx\transform.inl
 
-1509984593 source:c:\users\eddossan\documents\github\shading\primitives\figure.cpp
+1510250650 source:c:\users\eddossan\documents\github\shading\primitives\figure.cpp
 	"Figure.h"
 	<iostream>
 
-1509984557 c:\users\eddossan\documents\github\shading\primitives\figure.h
+1510236399 c:\users\eddossan\documents\github\shading\primitives\figure.h
 	"../library.h"
 	<string>
 
-1510049991 source:c:\users\eddossan\documents\github\shading\main.cpp
+1510252055 source:c:\users\eddossan\documents\github\shading\main.cpp
 	<iostream>
 	<fstream>
 	<sstream>

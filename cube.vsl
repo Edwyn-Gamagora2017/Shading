@@ -6,23 +6,24 @@ layout(location=2) in vec2 uv;
 
 uniform mat4x4 modelTransf;
 uniform mat4x4 pvTransf;
+uniform mat4x4 mirrorModelTransf;
 
-out vec3 posOrig;
-out vec3 norm;
+out vec3 positionModel;
+out vec3 normalModel;
 out vec2 uvTex;
 
 void main()
 {
     // the position and the normal are modified by the model transformation
     vec4 posModel = modelTransf*vec4(position.xyz, 1);
-    vec4 normalModel = modelTransf*vec4(normal.xyz, 1);
+    vec4 normModel = modelTransf*vec4(normal.xyz, 1);
 
     // only the position is modified by the projectionView transformation
-	vec4 posProjView = pvTransf*posModel;
+	vec4 posProjView = pvTransf*mirrorModelTransf*posModel;
 
 	gl_Position = posProjView;
-	posOrig = posModel.xyz;
-	norm = normalModel.xyz;
+	positionModel = posModel.xyz;
+	normalModel = normModel.xyz;
 	uvTex = uv;
 }
 

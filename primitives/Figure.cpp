@@ -11,6 +11,7 @@ Figure::Figure( std::vector<Triangle> triangles, bool isMirror, glm::tvec3<float
     this->nTriangles = triangles.size();
     glGenVertexArrays(1, &this->vertexArray);
     glGenBuffers(1, &this->vertexBuffer);
+    this->initPointersAndBuffers();
 
     /* TRANSFORMATIONS */
     this->translation = translation;
@@ -76,7 +77,23 @@ void Figure::initPointersAndBuffers()
 	glVertexAttribPointer(Figure::textureUVPosition, 2, GL_FLOAT, GL_FALSE, sizeVec3 * 2 + sizeVec2, (void*) (2*sizeVec3));
 	glEnableVertexAttribArray(Figure::textureUVPosition);
 
-	//glUseProgram(this->program);
+	this->closePointersAndBuffers();
+}
+
+void Figure::bindPointersAndBuffers()
+{
+    /* VERTEX and NORMAL */
+    // VertexArray
+	glBindVertexArray(this->vertexArray);
+	// Buffer
+	glBindBuffer(GL_ARRAY_BUFFER, this->vertexBuffer);
+
+	// Vertices
+	glEnableVertexAttribArray(Figure::vertexArrayPosition);
+	// Normals
+	glEnableVertexAttribArray(Figure::normalArrayPosition);
+	// UV
+	glEnableVertexAttribArray(Figure::textureUVPosition);
 }
 
 void Figure::closePointersAndBuffers()
@@ -87,8 +104,6 @@ void Figure::closePointersAndBuffers()
     glDisableVertexAttribArray(Figure::vertexArrayPosition);
     glDisableVertexAttribArray(Figure::normalArrayPosition);
     glDisableVertexAttribArray(Figure::textureUVPosition);
-
-    //glUseProgram(0);
 }
 
 void Figure::SetTexture( const Texture &texture )
@@ -98,7 +113,7 @@ void Figure::SetTexture( const Texture &texture )
 
 void Figure::draw()
 {
-    this->initPointersAndBuffers();
+    this->bindPointersAndBuffers();
 
     glActiveTexture(this->textureIndex);
     glBindTexture(GL_TEXTURE_2D, this->texture.tex);

@@ -279,7 +279,7 @@ std::vector<Triangle> cube(float width, float height, float depth)
     std::vector<Triangle> square5 = square( p2, p6, p7, p3 );
     tris.insert( tris.end(), square5.begin(), square5.end() );
         // Bottom
-    std::vector<Triangle> square6 = square( p8, p4, p1, p5 );
+    std::vector<Triangle> square6 = square( p4, p8, p5, p1 );
     tris.insert( tris.end(), square6.begin(), square6.end() );
 
 	return tris;
