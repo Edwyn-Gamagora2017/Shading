@@ -88,6 +88,7 @@ void init()
         figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(0.,1.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(1.1,1.,0.), glm::tvec3<float>(45.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         // Floor
+        //figures.push_back(new Figure( square(1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(3.), program, floorTexture, GL_TEXTURE2 ));
         mirror = new Figure( square(1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(3.), program, floorTexture, GL_TEXTURE2 );
     }
 }
@@ -95,9 +96,9 @@ void init()
 double itMov = 0;
 float cameraRatio = 1.;
 float cameraDistance = 2;
-glm::vec3 cameraPosition = glm::vec3(0, 1, cameraDistance);
+glm::vec3 cameraPosition = glm::vec3(1, 2, cameraDistance);
 glm::vec3 cameraUp = glm::vec3(0, -1, 0);
-glm::vec4 lightPosition = glm::vec4(0., 1., 1.5, 4.);
+glm::vec4 lightPosition = glm::vec4(1., 0.5, 1.5, 4.);
 float cameraFovV = 30.;
 float cameraNearV = 1.;
 float cameraFarV = cameraDistance*3;
@@ -107,7 +108,7 @@ glm::tmat4x4<GLfloat> identity = glm::tmat4x4<GLfloat>(1.);
 void render(const int width, const int height){
     // reseting buffers
     glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(1, 0, 0, 0);
+    glClearColor(.5, .7, .5, 0);
     glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
@@ -115,9 +116,9 @@ void render(const int width, const int height){
     glViewport(0, 0, width, height);
 
     // Rotate camera
-    itMov = itMov + 1;
+    itMov = itMov + 0.05;
     if (itMov > 360) itMov -= 360;
-    //cameraPosition = glm::vec3(cos(itMov*PI / 180)*cameraDistance, 0, sin(itMov*PI / 180)*cameraDistance);
+    cameraPosition = glm::vec3(cos(itMov*PI / 180)*cameraDistance, 2, sin(itMov*PI / 180)*cameraDistance);
 
     glm::tmat4x4<GLfloat> cameraProjectionMatrix = glm::perspective<GLfloat>(cameraFovV, cameraRatio, cameraNearV, cameraFarV);
     glm::tmat4x4<GLfloat, glm::precision::packed_highp> cameraLookAtMatrix = glm::lookAt<GLfloat, glm::precision::packed_highp>(cameraPosition, cameraTargetPosition, cameraUp);

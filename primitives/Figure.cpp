@@ -41,6 +41,7 @@ glm::tvec3<float> Figure::getTranslation(){ return this->translation; }
 glm::tvec3<float> Figure::getRotation(){ return this->rotation; }
 glm::tvec3<float> Figure::getScale(){ return this->scale; }
 glm::tmat4x4<float> Figure::getModelTransf(){ return this->modelTransf; }
+glm::tmat4x4<float> Figure::getModelRotationTransf(){ return this->modelRotationTransf; }
 
 void Figure::initPointersAndBuffers()
 {
@@ -121,6 +122,8 @@ void Figure::draw()
     // Model
     int itModel = glGetUniformLocation(this->program, "modelTransf");
     glUniformMatrix4fv(itModel, 1, false, &(this->modelTransf[0][0]));
+    int itModelRotation = glGetUniformLocation(this->program, "modelRotationTransf");
+    glUniformMatrix4fv(itModelRotation, 1, false, &(this->modelRotationTransf[0][0]));
 
     glDrawArrays(GL_TRIANGLES, 0, this->nTriangles * 3);
 
@@ -139,6 +142,7 @@ void Figure::calculateModeTransf()
     glm::tmat4x4<float> rotationTransfZ     = glm::rotate(identityMatrix, degreesToRadians(this->rotation.z), glm::vec3(0.,0.,1.));
     glm::tmat4x4<float> scaleTransf         = glm::scale(identityMatrix, this->scale);
     this->modelTransf = translationTransf*rotationTransfX*rotationTransfY*rotationTransfZ*scaleTransf;
+    this->modelRotationTransf = rotationTransfX*rotationTransfY*rotationTransfZ;
 }
 
 Figure::~Figure()

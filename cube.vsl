@@ -1,10 +1,11 @@
-#version 430
+#version 330
 
 layout(location=0) in vec3 position;
 layout(location=1) in vec3 normal;
 layout(location=2) in vec2 uv;
 
 uniform mat4x4 modelTransf;
+uniform mat4x4 modelRotationTransf;              // useful for transform the normal
 uniform mat4x4 pvTransf;
 uniform mat4x4 mirrorModelTransf;
 
@@ -16,7 +17,7 @@ void main()
 {
     // the position and the normal are modified by the model transformation
     vec4 posModel = modelTransf*vec4(position.xyz, 1);
-    vec4 normModel = modelTransf*vec4(normal.xyz, 1);
+    vec4 normModel = modelRotationTransf*vec4(normal.xyz, 1);
 
     // only the position is modified by the projectionView transformation
 	vec4 posProjView = pvTransf*mirrorModelTransf*posModel;

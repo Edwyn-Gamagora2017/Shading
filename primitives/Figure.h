@@ -43,6 +43,7 @@ class Figure
         glm::tvec3<float> getRotation();
         glm::tvec3<float> getScale();
         glm::tmat4x4<float> getModelTransf();
+        glm::tmat4x4<float> getModelRotationTransf();
 
         void draw();
 
@@ -52,6 +53,7 @@ class Figure
         glm::tvec3<float> rotation;
         glm::tvec3<float> scale;
         glm::tmat4x4<float> modelTransf;
+        glm::tmat4x4<float> modelRotationTransf;
         bool isMirror;
 
         GLuint program; //!< Member variable "program"
