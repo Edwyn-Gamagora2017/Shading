@@ -114,16 +114,23 @@ void init()
         figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(0.,1.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(1.1,1.,0.), glm::tvec3<float>(45.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         // Floor
-        //figures.push_back(new Figure( square(1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(3.), program, mirrorTexture, GL_TEXTURE2 ));
         mirror = new Figure( square(1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
+        //mirror = new Figure( square(1, 1), true, glm::tvec3<float>(2.5,1.,0.), glm::tvec3<float>(0.,-90.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
+        //mirror = new Figure( square(1, 1), true, glm::tvec3<float>(0,1.,-2.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
+        //*
         portal1 = new Figure( square(1, 1), false, glm::tvec3<float>(-2.5,1.,0.), glm::tvec3<float>(0.,90.,0.), glm::tvec3<float>(2.), program, portalTexture, GL_TEXTURE2 );
         portal2 = new Figure( square(1, 1), false, glm::tvec3<float>(2.5,1.,0.), glm::tvec3<float>(0.,-90.,0.), glm::tvec3<float>(2.), program, portalTexture, GL_TEXTURE2 );
+        //*/
+        /*
+        portal1 = new Figure( square(1, 1), false, glm::tvec3<float>(0.,1.,-2.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(2.), program, portalTexture, GL_TEXTURE2 );
+        portal2 = new Figure( square(1, 1), false, glm::tvec3<float>(0,1.,2.), glm::tvec3<float>(180.,0.,0.), glm::tvec3<float>(2.), program, portalTexture, GL_TEXTURE2 );
+        /*/
     }
 }
 
 double itMov = 0;
 float cameraRatio = 1.;
-float cameraDistance = 2;
+float cameraDistance = 4;
 glm::vec3 cameraPosition = glm::vec3(2, 2, cameraDistance);
 glm::vec3 cameraUp = glm::vec3(0, -1, 0);
 glm::vec4 lightPosition = glm::vec4(2, 2, 1.5, 6.);
@@ -153,8 +160,8 @@ void render(const int width, const int height){
     glm::tmat4x4<GLfloat> cameraPVMatrix = cameraProjectionMatrix*cameraLookAtMatrix;
     glm::tmat4x4<GLfloat> mirrorModelMatrix = mirror->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( mirror->getModelTransf() );
     //glm::tmat4x4<GLfloat> portal1ModelMatrix = portal1->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( portal->getModelTransf() );
-    glm::tmat4x4<GLfloat> portal1ModelMatrix = glm::scale(glm::vec3( 1.,1.,-1. ))*portal1->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( portal2->getModelTransf() );
-    glm::tmat4x4<GLfloat> portal2ModelMatrix = glm::scale(glm::vec3( 1.,1.,-1. ))*portal2->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( portal1->getModelTransf() );
+    glm::tmat4x4<GLfloat> portal1ModelMatrix = portal1->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( portal2->getModelTransf() );
+    glm::tmat4x4<GLfloat> portal2ModelMatrix = portal2->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( portal1->getModelTransf() );
 
     glUseProgram( program );
 
@@ -186,14 +193,12 @@ void render(const int width, const int height){
     // Draw Mirror
     glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    //glStencilMask(0xFF); // Write to stencil buffer
     glDepthMask(GL_FALSE); // Don't write to depth buffer
 
     glUniformMatrix4fv(itMirror, 1, false, &(identity[0][0]));
     mirror->draw();
 
     glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
-    //glStencilMask(0x00); // Don't write anything to stencil buffer
     glDepthMask(GL_TRUE); // Write to depth buffer
 
     // Render Mirror Camera
