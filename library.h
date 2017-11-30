@@ -35,6 +35,8 @@ std::vector<Triangle> cube(float width, float height, float depth);
 
 // Read an stl file and return a list of triangles
 std::vector<Triangle> readStl(const std::string &filename);
+// Read an off file and return a list of triangles
+std::vector<Triangle> readOff(const std::string &filename);
 
 struct texImage {
 	int w, h;					// width, height

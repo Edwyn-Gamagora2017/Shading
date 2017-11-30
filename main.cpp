@@ -83,6 +83,15 @@ void init()
         figures.push_back( new Figure( trisMonkey, false, glm::tvec3<float>(0,0,0), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
     }
     else{
+        //std::vector<Triangle> mesh = readStl("monkey.stl");
+        std::vector<Triangle> mesh = readOff("mesh/triceratops");
+        // UV
+        FOR(i,mesh.size())
+            FOR(j,3)
+                mesh[i].pn[j].uv = glm::vec2(mesh[i].pn[j].p.x,mesh[i].pn[j].p.z);
+        //figures.push_back( new Figure( mesh, false, glm::tvec3<float>(-1,1,0), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(0.5), program, wallTexture, GL_TEXTURE2 ) );
+        figures.push_back( new Figure( mesh, false, glm::tvec3<float>(-1.5,1,0), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+
         //figures.push_back( new Figure( square(1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         // Cube
         figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(0.,1.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
