@@ -2,24 +2,19 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
+	<File name="main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5302" topLine="110" />
+		</Cursor>
+	</File>
+	<File name="library.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1714" topLine="23" />
+		</Cursor>
+	</File>
 	<File name="glad_gl4.3\src\glad.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="8047" topLine="275" />
-		</Cursor>
-	</File>
-	<File name="cube.vsl" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="10" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="library.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="9277" topLine="344" />
-		</Cursor>
-	</File>
-	<File name="primitives\Figure.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1547" topLine="41" />
 		</Cursor>
 	</File>
 	<File name="primitives\Figure.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -27,9 +22,14 @@
 			<Cursor1 position="1941" topLine="29" />
 		</Cursor>
 	</File>
-	<File name="library.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="primitives\Figure.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1234" topLine="23" />
+			<Cursor1 position="1547" topLine="41" />
+		</Cursor>
+	</File>
+	<File name="library.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2494" topLine="91" />
 		</Cursor>
 	</File>
 	<File name="cube.fsl" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -37,9 +37,9 @@
 			<Cursor1 position="10" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="cube.vsl" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3051" topLine="75" />
+			<Cursor1 position="296" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

@@ -46,7 +46,7 @@ struct texImage {
 texImage readPPM(const std::string &filename);
 texImage singleColor(int width, int height, float r, float g, float b);
 
-void runGL(void (*init)(), void (*render)(const int width, const int height));
+void runGL(void (*init)(), void (*render)(const int width, const int height), void (*key_callback)(GLFWwindow* window, int key, int scancode, int action, int mods));
 
 std::string vecToString( glm::vec3 v );
 float degreesToRadians( float degrees );

@@ -97,11 +97,12 @@ GLFWwindow* openContext()
 	return window;
 }
 
-void runGL(void (*init)(),void (*render)(const int width, const int height))
+void runGL(void (*init)(),void (*render)(const int width, const int height), void (*key_callback)(GLFWwindow* window, int key, int scancode, int action, int mods))
 {
 	auto window = openContext();
 
 	init();
+	glfwSetKeyCallback(window, key_callback);
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
