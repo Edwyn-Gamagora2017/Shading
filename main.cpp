@@ -58,6 +58,17 @@ void initEmptyTexture(int width, int height, Texture * texture)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
+void initDepthTexture(int width, int height, Texture * texture)
+{
+    texture->width = width;
+    texture->height = height;
+
+    glGenTextures( 1, &(texture->tex) );
+	glBindTexture(GL_TEXTURE_2D, texture->tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, texture->width, texture->height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
     if (glfwGetKey( window, GLFW_KEY_SPACE ) == GLFW_PRESS){
@@ -80,8 +91,8 @@ void init()
     initTexture( readPPM("texture-arrow"), &wallTexture );
     initTexture( singleColor(100,100,1,1,1), &mirrorTexture );
     initTexture( singleColor(100,100,1,1,0.), &portalTexture );
-    initTexture( singleColor(200,200,1,0,0), &frameTexture );
     initTexture( singleColor(200,200,0,0.5,0), &floorTexture );
+    initDepthTexture( 640, 640, &frameTexture );
 	// END TEXTURE
 
 	// FRAMEBUFFER
@@ -117,7 +128,7 @@ void init()
         // Floor
         figures.push_back( new Figure( square(2, 2), false, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(2.), program, floorTexture, GL_TEXTURE2 ) );
         // Mirror
-        mirror = new Figure( square(1, 1), true, glm::tvec3<float>(0.,3.,2.), glm::tvec3<float>(-30.,0.,0.), glm::tvec3<float>(3.), program, mirrorTexture, GL_TEXTURE2 );
+        mirror = new Figure( square(1, 1), true, glm::tvec3<float>(0.,2.,2.), glm::tvec3<float>(-30.,0.,0.), glm::tvec3<float>(3.), program, mirrorTexture, GL_TEXTURE2 );
         //mirror = new Figure( square(1, 1), true, glm::tvec3<float>(2.5,1.,0.), glm::tvec3<float>(0.,-90.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
         //mirror = new Figure( square(1, 1), true, glm::tvec3<float>(0,1.,-2.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
         //*
@@ -133,7 +144,7 @@ void init()
 
 double itMov = 0;
 float cameraRatio = 1.;
-float cameraDistance = 4;
+float cameraDistance = 2;
 glm::vec3 cameraPosition = glm::vec3(2, 2, cameraDistance);
 glm::vec3 cameraUp = glm::vec3(0, -1, 0);
 glm::vec4 lightPosition = glm::vec4(2, 2, 1.5, 6.);
@@ -161,8 +172,9 @@ void render(const int width, const int height){
     glm::tmat4x4<GLfloat> cameraProjectionMatrix = glm::perspective<GLfloat>(cameraFovV, cameraRatio, cameraNearV, cameraFarV);
     glm::tmat4x4<GLfloat, glm::precision::packed_highp> cameraLookAtMatrix = glm::lookAt<GLfloat, glm::precision::packed_highp>(cameraPosition, cameraTargetPosition, cameraUp);
     glm::tmat4x4<GLfloat> cameraPVMatrix = cameraProjectionMatrix*cameraLookAtMatrix;
+
+    // Mirror
     glm::tmat4x4<GLfloat> mirrorModelMatrix = mirror->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( mirror->getModelTransf() );
-    //glm::tmat4x4<GLfloat> portal1ModelMatrix = portal1->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( portal->getModelTransf() );
     glm::tmat4x4<GLfloat> portal1ModelMatrix = portal1->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( portal2->getModelTransf() );
     glm::tmat4x4<GLfloat> portal2ModelMatrix = portal2->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( portal1->getModelTransf() );
 
@@ -182,6 +194,10 @@ void render(const int width, const int height){
     // Light
     int itLight = glGetUniformLocation(program, "lightInfo");
     glUniform4f(itLight, lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
+
+    // Render Depth
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Render Main Camera
     FOR(i,figures.size()){
