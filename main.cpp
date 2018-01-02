@@ -26,7 +26,7 @@
 
 GLuint program;
 GLuint frameBuffer;
-Texture frameTexture, wallTexture, mirrorTexture, portalTexture;
+Texture frameTexture, wallTexture, mirrorTexture, portalTexture, floorTexture;
 bool monkey = false;
 bool captureFrame = false;
 std::vector<Figure *> figures;
@@ -81,6 +81,7 @@ void init()
     initTexture( singleColor(100,100,1,1,1), &mirrorTexture );
     initTexture( singleColor(100,100,1,1,0.), &portalTexture );
     initTexture( singleColor(200,200,1,0,0), &frameTexture );
+    initTexture( singleColor(200,200,0,0.5,0), &floorTexture );
 	// END TEXTURE
 
 	// FRAMEBUFFER
@@ -114,7 +115,9 @@ void init()
         figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(0.,1.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(1.1,1.,0.), glm::tvec3<float>(45.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         // Floor
-        mirror = new Figure( square(1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
+        figures.push_back( new Figure( square(2, 2), false, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(2.), program, floorTexture, GL_TEXTURE2 ) );
+        // Mirror
+        mirror = new Figure( square(1, 1), true, glm::tvec3<float>(0.,3.,2.), glm::tvec3<float>(-30.,0.,0.), glm::tvec3<float>(3.), program, mirrorTexture, GL_TEXTURE2 );
         //mirror = new Figure( square(1, 1), true, glm::tvec3<float>(2.5,1.,0.), glm::tvec3<float>(0.,-90.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
         //mirror = new Figure( square(1, 1), true, glm::tvec3<float>(0,1.,-2.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
         //*
