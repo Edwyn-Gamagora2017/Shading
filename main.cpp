@@ -30,7 +30,7 @@ Texture frameTexture, wallTexture, mirrorTexture, portalTexture, floorTexture;
 bool monkey = false;
 bool captureFrame = false;
 std::vector<Figure *> figures;
-Figure * mirror, * portal1, * portal2;
+Figure * mirror, * mirror2, * portal1, * portal2;
 
 bool rotateCamera = true;
 float cameraPositionHeight = 2.;
@@ -128,26 +128,20 @@ void init()
         // Floor
         figures.push_back( new Figure( square(2, 2), false, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(2.), program, floorTexture, GL_TEXTURE2 ) );
         // Mirror
-        mirror = new Figure( square(1, 1), true, glm::tvec3<float>(0.,2.,2.), glm::tvec3<float>(-30.,0.,0.), glm::tvec3<float>(3.), program, mirrorTexture, GL_TEXTURE2 );
-        //mirror = new Figure( square(1, 1), true, glm::tvec3<float>(2.5,1.,0.), glm::tvec3<float>(0.,-90.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
-        //mirror = new Figure( square(1, 1), true, glm::tvec3<float>(0,1.,-2.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
-        //*
-        portal1 = new Figure( square(1, 1), false, glm::tvec3<float>(-2.5,1.,0.), glm::tvec3<float>(0.,90.,0.), glm::tvec3<float>(2.), program, portalTexture, GL_TEXTURE2 );
-        portal2 = new Figure( square(1, 1), false, glm::tvec3<float>(2.5,1.,0.), glm::tvec3<float>(0.,-90.,0.), glm::tvec3<float>(2.), program, portalTexture, GL_TEXTURE2 );
-        //*/
-        /*
-        portal1 = new Figure( square(1, 1), false, glm::tvec3<float>(0.,1.,-2.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(2.), program, portalTexture, GL_TEXTURE2 );
-        portal2 = new Figure( square(1, 1), false, glm::tvec3<float>(0,1.,2.), glm::tvec3<float>(180.,0.,0.), glm::tvec3<float>(2.), program, portalTexture, GL_TEXTURE2 );
-        /*/
+        mirror = new Figure( square(1, 1), true, glm::tvec3<float>(-2,1.5,-2.), glm::tvec3<float>(0.,45.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
+        mirror2 = new Figure( square(1, 1), true, glm::tvec3<float>(2,1.5,2.), glm::tvec3<float>(0.,225.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
+        // Portal
+        portal1 = new Figure( square(1, 1), false, glm::tvec3<float>(-2.5,1.,0.5), glm::tvec3<float>(0.,90.,0.), glm::tvec3<float>(2.), program, portalTexture, GL_TEXTURE2 );
+        portal2 = new Figure( square(1, 1), false, glm::tvec3<float>(0.5,1.,-2.5), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(2.), program, portalTexture, GL_TEXTURE2 );
     }
 }
 
 double itMov = 0;
 float cameraRatio = 1.;
-float cameraDistance = 2;
+float cameraDistance = 2.5;
 glm::vec3 cameraPosition = glm::vec3(2, 2, cameraDistance);
 glm::vec3 cameraUp = glm::vec3(0, -1, 0);
-glm::vec4 lightPosition = glm::vec4(2, 2, 1.5, 6.);
+glm::vec4 lightPosition = glm::vec4(-2, 2, -1.5, 6.);
 float cameraFovV = 30.;
 float cameraNearV = 1.;
 float cameraFarV = cameraDistance*6;
@@ -175,8 +169,9 @@ void render(const int width, const int height){
 
     // Mirror
     glm::tmat4x4<GLfloat> mirrorModelMatrix = mirror->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( mirror->getModelTransf() );
-    glm::tmat4x4<GLfloat> portal1ModelMatrix = portal1->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( portal2->getModelTransf() );
-    glm::tmat4x4<GLfloat> portal2ModelMatrix = portal2->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( portal1->getModelTransf() );
+    glm::tmat4x4<GLfloat> mirror2ModelMatrix = mirror2->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( mirror2->getModelTransf() );
+    glm::tmat4x4<GLfloat> portal1ModelMatrix = portal1->getModelTransf()*glm::scale(glm::vec3( -1.,1.,-1. ))*glm::inverse( portal2->getModelTransf() );
+    glm::tmat4x4<GLfloat> portal2ModelMatrix = portal2->getModelTransf()*glm::scale(glm::vec3( -1.,1.,-1. ))*glm::inverse( portal1->getModelTransf() );
 
     glUseProgram( program );
 
@@ -195,9 +190,15 @@ void render(const int width, const int height){
     int itLight = glGetUniformLocation(program, "lightInfo");
     glUniform4f(itLight, lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
 
-    // Render Depth
+     // Render Depth
+    /*
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+    FOR(i,figures.size()){
+        figures[i]->draw();
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    */
 
     // Render Main Camera
     FOR(i,figures.size()){
@@ -229,6 +230,31 @@ void render(const int width, const int height){
 
 //    glDisable(GL_STENCIL_TEST);
     // END Render Stencil = MIRROR
+
+    // Render Stencil = MIRROR2
+//*
+    glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+
+    // Draw Mirror
+    glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glDepthMask(GL_FALSE); // Don't write to depth buffer
+
+    glUniformMatrix4fv(itMirror, 1, false, &(identity[0][0]));
+    mirror2->draw();
+
+    glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
+    glDepthMask(GL_TRUE); // Write to depth buffer
+
+    // Render Mirror Camera
+    glUniformMatrix4fv(itMirror, 1, false, &(mirror2ModelMatrix[0][0]));
+    for(auto &f : figures)
+    {
+        f->draw();
+    }
+
+//    glDisable(GL_STENCIL_TEST);
+    // END Render Stencil = MIRROR2
 //*/
 //*
     // Render Stencil = Portal1

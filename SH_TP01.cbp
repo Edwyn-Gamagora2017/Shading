@@ -46,8 +46,6 @@
 			<Add library="../glfw-3.2.1.bin.WIN32/lib-mingw/libglfw3dll.a" />
 			<Add directory="../glfw-3.2.1.bin.WIN32/lib-mingw" />
 		</Linker>
-		<Unit filename="basic.fsl" />
-		<Unit filename="basic.vsl" />
 		<Unit filename="cube.fsl" />
 		<Unit filename="cube.vsl" />
 		<Unit filename="glad_gl4.3/src/glad.c">
