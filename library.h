@@ -35,6 +35,8 @@ std::vector<Triangle> cube(float width, float height, float depth);
 
 // Read an stl file and return a list of triangles
 std::vector<Triangle> readStl(const std::string &filename);
+// Read an off file and return a list of triangles
+std::vector<Triangle> readOff(const std::string &filename);
 
 struct texImage {
 	int w, h;					// width, height
@@ -44,7 +46,7 @@ struct texImage {
 texImage readPPM(const std::string &filename);
 texImage singleColor(int width, int height, float r, float g, float b);
 
-void runGL(void (*init)(), void (*render)(const int width, const int height));
+void runGL(void (*init)(), void (*render)(const int width, const int height), void (*key_callback)(GLFWwindow* window, int key, int scancode, int action, int mods));
 
 std::string vecToString( glm::vec3 v );
 float degreesToRadians( float degrees );

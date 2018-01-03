@@ -97,11 +97,12 @@ GLFWwindow* openContext()
 	return window;
 }
 
-void runGL(void (*init)(),void (*render)(const int width, const int height))
+void runGL(void (*init)(),void (*render)(const int width, const int height), void (*key_callback)(GLFWwindow* window, int key, int scancode, int action, int mods))
 {
 	auto window = openContext();
 
 	init();
+	glfwSetKeyCallback(window, key_callback);
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -279,8 +280,12 @@ std::vector<Triangle> cube(float width, float height, float depth)
     std::vector<Triangle> square5 = square( p2, p6, p7, p3 );
     tris.insert( tris.end(), square5.begin(), square5.end() );
         // Bottom
-    std::vector<Triangle> square6 = square( p8, p4, p1, p5 );
+    std::vector<Triangle> square6 = square( p4, p8, p5, p1 );
     tris.insert( tris.end(), square6.begin(), square6.end() );
+
+    /*FOR(i,tris.size()){
+        std::cout << tris[i].pn[0].n.x << " + "<< tris[i].pn[0].n.y << " + " << tris[i].pn[0].n.z << std::endl;
+    }*/
 
 	return tris;
 }
@@ -335,7 +340,7 @@ std::vector<Triangle> readStl(const std::string &filename)
 
 		if(file.good())
 		{
-			glm::vec3 normal = glm::normalize(glm::cross(t.pn[2].p - t.pn[0].p, t.pn[1].p - t.pn[0].p));
+			glm::vec3 normal = glm::normalize(glm::cross( t.pn[1].p - t.pn[0].p, t.pn[2].p - t.pn[0].p ));
 			for(int i = 0; i < 3; i++)
 				t.pn[i].n = normal;
 
@@ -344,6 +349,54 @@ std::vector<Triangle> readStl(const std::string &filename)
 	} while(file.good());
 
 	return tris;
+}
+
+std::vector<Triangle> readOff( const std::string &filename )
+{
+    std::ifstream reader;
+	reader.open( std::string(filename+".off").c_str() );
+	assert(reader.is_open());
+
+	std::string type;
+	reader >> type;
+	assert( type == "OFF" );
+
+	int nPoints, nFaces, nEdges;
+	reader >> nPoints >> nFaces >> nEdges;
+	std::vector<glm::vec3> points;
+	std::vector<Triangle> faces;
+
+	double x,y,z;
+	int pPerFace, pIndex;
+	FOR( i, nPoints )
+	{
+        reader >> x >> y >> z;
+	    points.push_back( glm::vec3(x,y,z) );
+	}
+	FOR( i, nFaces )
+	{
+	    reader >> pPerFace;
+	    assert(pPerFace == 3);
+
+	    Triangle t;
+	    FOR(j,pPerFace)
+	    {
+            reader >> pIndex;
+            t.pn[j].p = points[ pIndex ];
+	    }
+        // Normal from the fist points
+        glm::vec3 normal = glm::normalize(glm::cross( t.pn[1].p - t.pn[0].p, t.pn[2].p - t.pn[0].p ));
+        FOR(j,pPerFace)
+	    {
+            t.pn[j].n = normal;
+	    }
+
+        faces.push_back(t);
+	}
+
+	reader.close();
+
+	return faces;
 }
 
 texImage readPPM(const std::string &filename)

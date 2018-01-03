@@ -26,10 +26,15 @@
 
 GLuint program;
 GLuint frameBuffer;
-Texture frameTexture, wallTexture, floorTexture;
+Texture frameTexture, wallTexture, mirrorTexture, portalTexture, floorTexture;
 bool monkey = false;
 bool captureFrame = false;
 std::vector<Figure *> figures;
+Figure * mirror, * mirror2, * portal1, * portal2;
+
+bool rotateCamera = true;
+float cameraPositionHeight = 2.;
+float cameraMoveStep = 0.1;
 
 void initTexture(texImage textureValues, Texture * texture)
 {
@@ -53,6 +58,29 @@ void initEmptyTexture(int width, int height, Texture * texture)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
+void initDepthTexture(int width, int height, Texture * texture)
+{
+    texture->width = width;
+    texture->height = height;
+
+    glGenTextures( 1, &(texture->tex) );
+	glBindTexture(GL_TEXTURE_2D, texture->tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, texture->width, texture->height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+    if (glfwGetKey( window, GLFW_KEY_SPACE ) == GLFW_PRESS){
+        rotateCamera = !rotateCamera;
+    }
+    if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS){
+        cameraPositionHeight += cameraMoveStep;
+    }
+    if (glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS){
+        cameraPositionHeight -= cameraMoveStep;
+    }
+}
 
 void init()
 {
@@ -61,8 +89,10 @@ void init()
 
 	// TEXTURE
     initTexture( readPPM("texture-arrow"), &wallTexture );
-    initTexture( singleColor(10,10,1,1,0), &floorTexture );
-    initTexture( singleColor(200,200,1,0,0), &frameTexture );
+    initTexture( singleColor(100,100,1,1,1), &mirrorTexture );
+    initTexture( singleColor(100,100,1,1,0.), &portalTexture );
+    initTexture( singleColor(200,200,0,0.5,0), &floorTexture );
+    initDepthTexture( 640, 640, &frameTexture );
 	// END TEXTURE
 
 	// FRAMEBUFFER
@@ -79,120 +109,206 @@ void init()
         FOR(i,trisMonkey.size())
             FOR(j,3)
                 trisMonkey[i].pn[j].uv = glm::vec2(trisMonkey[i].pn[j].p.x,trisMonkey[i].pn[j].p.z);
-        figures.push_back( new Figure( trisMonkey, glm::tvec3<float>(0,0,0), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+        figures.push_back( new Figure( trisMonkey, false, glm::tvec3<float>(0,0,0), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
     }
     else{
+        //std::vector<Triangle> mesh = readStl("monkey.stl");
+        std::vector<Triangle> mesh = readOff("mesh/triceratops");
+        // UV
+        FOR(i,mesh.size())
+            FOR(j,3)
+                mesh[i].pn[j].uv = glm::vec2(mesh[i].pn[j].p.x,mesh[i].pn[j].p.z);
+        //figures.push_back( new Figure( mesh, false, glm::tvec3<float>(-1,1,0), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(0.5), program, wallTexture, GL_TEXTURE2 ) );
+        figures.push_back( new Figure( mesh, false, glm::tvec3<float>(-1.2,1,0), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+
+        //figures.push_back( new Figure( square(1, 1), true, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         // Cube
-        figures.push_back( new Figure( cube(1, 1, 1), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+        figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(0.,1.,0.), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
+        figures.push_back( new Figure( cube(1, 1, 1), false, glm::tvec3<float>(1.1,1.,0.), glm::tvec3<float>(45.,0.,0.), glm::tvec3<float>(1.), program, wallTexture, GL_TEXTURE2 ) );
         // Floor
-        figures.push_back( new Figure( square(1, 1), glm::tvec3<float>(0.,-0.5,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(3.), program, floorTexture, GL_TEXTURE2 ) );
+        figures.push_back( new Figure( square(2, 2), false, glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(-90.,0.,0.), glm::tvec3<float>(2.), program, floorTexture, GL_TEXTURE2 ) );
+        // Mirror
+        mirror = new Figure( square(1, 1), true, glm::tvec3<float>(-2,1.5,-2.), glm::tvec3<float>(0.,45.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
+        mirror2 = new Figure( square(1, 1), true, glm::tvec3<float>(2,1.5,2.), glm::tvec3<float>(0.,225.,0.), glm::tvec3<float>(2.), program, mirrorTexture, GL_TEXTURE2 );
+        // Portal
+        portal1 = new Figure( square(1, 1), false, glm::tvec3<float>(-2.5,1.,0.5), glm::tvec3<float>(0.,90.,0.), glm::tvec3<float>(2.), program, portalTexture, GL_TEXTURE2 );
+        portal2 = new Figure( square(1, 1), false, glm::tvec3<float>(0.5,1.,-2.5), glm::tvec3<float>(0.,0.,0.), glm::tvec3<float>(2.), program, portalTexture, GL_TEXTURE2 );
     }
 }
 
 double itMov = 0;
-bool writingBuffer = true;
-void render(const int width, const int height)
-{
+float cameraRatio = 1.;
+float cameraDistance = 2.5;
+glm::vec3 cameraPosition = glm::vec3(2, 2, cameraDistance);
+glm::vec3 cameraUp = glm::vec3(0, -1, 0);
+glm::vec4 lightPosition = glm::vec4(-2, 2, -1.5, 6.);
+float cameraFovV = 30.;
+float cameraNearV = 1.;
+float cameraFarV = cameraDistance*6;
+glm::vec3 cameraTargetPosition = glm::vec3(0, 1, 0);
+glm::tmat4x4<GLfloat> identity = glm::tmat4x4<GLfloat>(1.);
+
+void render(const int width, const int height){
     // reseting buffers
     glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(1, 1, 1, 0);
+    glClearColor(.5, .7, .5, 0);
     glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    // standard values
-        // Color
-    float color = 0.3f;
-        // Window resize
-    float ratio = 1.;
-    ratio = width / (float)height;
-    /*if (width > height)
-    {
-        ratio = height / (float)width;
-        glUniform2f(l, ratio, 1);
-    }
-    else
-    {
-        ratio = width / (float)height;
-        glUniform2f(l, 1, ratio);
-    }*/
-        // Perspective and Camera and Light
-    float distCamera;
-    glm::vec3 cameraP, cameraUp;
-    glm::vec4 lightP;
-    itMov = itMov + 1;
+ //   glBindFramebuffer(GL_FRAMEBUFFER, bufferToRender);
+    glViewport(0, 0, width, height);
+
+    // Rotate camera
+    itMov = itMov + (rotateCamera?0.05:0);
     if (itMov > 360) itMov -= 360;
-    if(monkey)
-    {
-        // monkey
-        distCamera = 3;
-        cameraP = glm::vec3(cos(itMov*PI / 180)*distCamera, sin(itMov*PI / 180)*distCamera, 0);
-        //cameraP = glm::vec3(0, -distCamera, 0);
-        cameraUp = glm::vec3(0, 0, -1);
-        lightP = glm::vec4(0, 2, 2, 10);
+    cameraPosition = glm::vec3(cos(itMov*PI / 180)*cameraDistance, cameraPositionHeight, sin(itMov*PI / 180)*cameraDistance);
+
+    glm::tmat4x4<GLfloat> cameraProjectionMatrix = glm::perspective<GLfloat>(cameraFovV, cameraRatio, cameraNearV, cameraFarV);
+    glm::tmat4x4<GLfloat, glm::precision::packed_highp> cameraLookAtMatrix = glm::lookAt<GLfloat, glm::precision::packed_highp>(cameraPosition, cameraTargetPosition, cameraUp);
+    glm::tmat4x4<GLfloat> cameraPVMatrix = cameraProjectionMatrix*cameraLookAtMatrix;
+
+    // Mirror
+    glm::tmat4x4<GLfloat> mirrorModelMatrix = mirror->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( mirror->getModelTransf() );
+    glm::tmat4x4<GLfloat> mirror2ModelMatrix = mirror2->getModelTransf()*glm::scale(glm::vec3( 1.,1.,-1. ))*glm::inverse( mirror2->getModelTransf() );
+    glm::tmat4x4<GLfloat> portal1ModelMatrix = portal1->getModelTransf()*glm::scale(glm::vec3( -1.,1.,-1. ))*glm::inverse( portal2->getModelTransf() );
+    glm::tmat4x4<GLfloat> portal2ModelMatrix = portal2->getModelTransf()*glm::scale(glm::vec3( -1.,1.,-1. ))*glm::inverse( portal1->getModelTransf() );
+
+    glUseProgram( program );
+
+    // Uniforms
+    // ViewPerspective
+    int itPersp = glGetUniformLocation(program, "pvTransf");
+    glUniformMatrix4fv(itPersp, 1, false, &(cameraPVMatrix[0][0]));
+    int itMirror = glGetUniformLocation(program, "mirrorModelTransf");
+    glUniformMatrix4fv(itMirror, 1, false, &(identity[0][0]));
+
+    // TEXTURE
+    int itTex = glGetUniformLocation(program, "tex");
+    glUniform1i(itTex, 2);
+
+    // Light
+    int itLight = glGetUniformLocation(program, "lightInfo");
+    glUniform4f(itLight, lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
+
+     // Render Depth
+    /*
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+    FOR(i,figures.size()){
+        figures[i]->draw();
     }
-    else
-    {
-        // square
-        distCamera = 2;
-        cameraP = glm::vec3(1, 1, distCamera);
-        cameraP = glm::vec3(cos(itMov*PI / 180)*distCamera, 0, sin(itMov*PI / 180)*distCamera);
-        cameraUp = glm::vec3(0, -1, 0);
-        lightP = glm::vec4(1, 1, distCamera, 2);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    */
+
+    // Render Main Camera
+    FOR(i,figures.size()){
+        figures[i]->draw();
     }
-    float fovV = 30.;
-    float nearV = 1.;
-    float farV = distCamera*3;
-    glm::vec3 objectP(0, 0, 0);
-    glm::tmat4x4<GLfloat> perspM = glm::perspective<GLfloat>(fovV, ratio, nearV, farV);
-    glm::tmat4x4<GLfloat, glm::precision::packed_highp> lookAtM = glm::lookAt<GLfloat, glm::precision::packed_highp>(cameraP, objectP, cameraUp);
-    glm::tmat4x4<GLfloat> resM = perspM*lookAtM;
-    // objects
-    FOR(j,figures.size()){
-        for (int i = 0; i < (captureFrame?2:1); i++)
-        {
-            if(captureFrame){
-                if (writingBuffer)
-                {
-                    figures[j]->SetTexture( wallTexture );
-                    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-                    glViewport(0, 0, frameTexture.width, frameTexture.height);
-                }
-                else {
-                    figures[j]->SetTexture( frameTexture );
-                    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                    glViewport(0, 0, width, height);
-                }
-                writingBuffer = !writingBuffer;
-            }
 
-            // TEST SETTEXTURE
-            /*if(writingBuffer) figures[j]->SetTexture(frameTexture);
-            if(!writingBuffer) figures[j]->SetTexture(wallTexture);
-            writingBuffer = !writingBuffer;*/
-            glUseProgram(figures[j]->Getprogram());
+    // Render Stencil = MIRROR
+//*
+    glEnable(GL_STENCIL_TEST);
+    glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
 
-            // Uniforms
-            // TEXTURE
-            int itTex = glGetUniformLocation(figures[j]->Getprogram(), "tex");
-            glUniform1i(itTex, 2);
+    // Draw Mirror
+    glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glDepthMask(GL_FALSE); // Don't write to depth buffer
 
-            // ViewPerspective
-            int itPersp = glGetUniformLocation(figures[j]->Getprogram(), "pvTransf");
-            glUniformMatrix4fv(itPersp, 1, false, &(resM[0][0]));
+    glUniformMatrix4fv(itMirror, 1, false, &(identity[0][0]));
+    mirror->draw();
 
-            // Light
-            int itLight = glGetUniformLocation(figures[j]->Getprogram(), "light");
-            glUniform4f(itLight, lightP.x, lightP.y, lightP.z, lightP.w);
+    glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
+    glDepthMask(GL_TRUE); // Write to depth buffer
 
-            figures[j]->draw();
+    // Render Mirror Camera
+    glUniformMatrix4fv(itMirror, 1, false, &(mirrorModelMatrix[0][0]));
+    for(auto &f : figures)
+    {
+        f->draw();
+    }
 
-            glUseProgram(0);
-        }
-	}
-	glDisable(GL_DEPTH_TEST);
+//    glDisable(GL_STENCIL_TEST);
+    // END Render Stencil = MIRROR
+
+    // Render Stencil = MIRROR2
+//*
+    glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+
+    // Draw Mirror
+    glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glDepthMask(GL_FALSE); // Don't write to depth buffer
+
+    glUniformMatrix4fv(itMirror, 1, false, &(identity[0][0]));
+    mirror2->draw();
+
+    glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
+    glDepthMask(GL_TRUE); // Write to depth buffer
+
+    // Render Mirror Camera
+    glUniformMatrix4fv(itMirror, 1, false, &(mirror2ModelMatrix[0][0]));
+    for(auto &f : figures)
+    {
+        f->draw();
+    }
+
+//    glDisable(GL_STENCIL_TEST);
+    // END Render Stencil = MIRROR2
+//*/
+//*
+    // Render Stencil = Portal1
+    glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+
+    // Draw Portal
+    glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glDepthMask(GL_FALSE); // Don't write to depth buffer
+
+    glUniformMatrix4fv(itMirror, 1, false, &(identity[0][0]));
+    portal1->draw();
+
+    glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
+    glDepthMask(GL_TRUE); // Write to depth buffer
+
+    // Render Mirror Camera
+    glUniformMatrix4fv(itMirror, 1, false, &(portal1ModelMatrix[0][0]));
+    for(auto &f : figures)
+    {
+        f->draw();
+    }
+    // END Render Stencil = Portal1
+//*/
+//*
+    // Render Stencil = Portal2
+    glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+
+    // Draw Portal
+    glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glDepthMask(GL_FALSE); // Don't write to depth buffer
+
+    glUniformMatrix4fv(itMirror, 1, false, &(identity[0][0]));
+    portal2->draw();
+
+    glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
+    glDepthMask(GL_TRUE); // Write to depth buffer
+
+    // Render Mirror Camera
+    glUniformMatrix4fv(itMirror, 1, false, &(portal2ModelMatrix[0][0]));
+    for(auto &f : figures)
+    {
+        f->draw();
+    }
+
+    glDisable(GL_STENCIL_TEST);
+    // END Render Stencil = Portal2
+//*/
+    glUseProgram(0);
+//    glDisable(GL_DEPTH_TEST);
 }
 
 int main(void)
 {
-	runGL(init, render);
+	runGL(init, render, key_callback);
 }

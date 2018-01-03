@@ -1,13 +1,17 @@
 #include "Figure.h"
 #include <iostream>
 
-Figure::Figure( std::vector<Triangle> triangles, glm::tvec3<float> translation, glm::tvec3<float> rotation, glm::tvec3<float> scale, GLuint program, Texture const &texture, GLenum textureIndex )
+Figure::Figure( std::vector<Triangle> triangles, bool isMirror, glm::tvec3<float> translation, glm::tvec3<float> rotation, glm::tvec3<float> scale, GLuint program, Texture const &texture, GLenum textureIndex )
 {
+    /* GENERAL DATA */
+    this->isMirror = isMirror;
+
     /* VERTICES, NORMALS */
     this->triangles = triangles;
     this->nTriangles = triangles.size();
     glGenVertexArrays(1, &this->vertexArray);
     glGenBuffers(1, &this->vertexBuffer);
+    this->initPointersAndBuffers();
 
     /* TRANSFORMATIONS */
     this->translation = translation;
@@ -28,6 +32,7 @@ size_t Figure::GetnTriangles() { return nTriangles; }
 Texture Figure::Gettexture() { return texture; }
 GLenum Figure::GettextureIndex() { return textureIndex; }
 GLuint Figure::GetvertexBuffer() { return vertexBuffer; }
+bool Figure::GetIsMirror(){ return this->isMirror; }
 
 void Figure::setTranslation(glm::tvec3<float> translation){ this->translation = translation; this->calculateModeTransf(); }
 void Figure::setRotation(glm::tvec3<float> rotation){ this->rotation = rotation; this->calculateModeTransf(); }
@@ -36,6 +41,7 @@ glm::tvec3<float> Figure::getTranslation(){ return this->translation; }
 glm::tvec3<float> Figure::getRotation(){ return this->rotation; }
 glm::tvec3<float> Figure::getScale(){ return this->scale; }
 glm::tmat4x4<float> Figure::getModelTransf(){ return this->modelTransf; }
+glm::tmat4x4<float> Figure::getModelRotationTransf(){ return this->modelRotationTransf; }
 
 void Figure::initPointersAndBuffers()
 {
@@ -72,7 +78,23 @@ void Figure::initPointersAndBuffers()
 	glVertexAttribPointer(Figure::textureUVPosition, 2, GL_FLOAT, GL_FALSE, sizeVec3 * 2 + sizeVec2, (void*) (2*sizeVec3));
 	glEnableVertexAttribArray(Figure::textureUVPosition);
 
-	//glUseProgram(this->program);
+	this->closePointersAndBuffers();
+}
+
+void Figure::bindPointersAndBuffers()
+{
+    /* VERTEX and NORMAL */
+    // VertexArray
+	glBindVertexArray(this->vertexArray);
+	// Buffer
+	glBindBuffer(GL_ARRAY_BUFFER, this->vertexBuffer);
+
+	// Vertices
+	glEnableVertexAttribArray(Figure::vertexArrayPosition);
+	// Normals
+	glEnableVertexAttribArray(Figure::normalArrayPosition);
+	// UV
+	glEnableVertexAttribArray(Figure::textureUVPosition);
 }
 
 void Figure::closePointersAndBuffers()
@@ -83,8 +105,6 @@ void Figure::closePointersAndBuffers()
     glDisableVertexAttribArray(Figure::vertexArrayPosition);
     glDisableVertexAttribArray(Figure::normalArrayPosition);
     glDisableVertexAttribArray(Figure::textureUVPosition);
-
-    //glUseProgram(0);
 }
 
 void Figure::SetTexture( const Texture &texture )
@@ -94,7 +114,7 @@ void Figure::SetTexture( const Texture &texture )
 
 void Figure::draw()
 {
-    this->initPointersAndBuffers();
+    this->bindPointersAndBuffers();
 
     glActiveTexture(this->textureIndex);
     glBindTexture(GL_TEXTURE_2D, this->texture.tex);
@@ -102,6 +122,8 @@ void Figure::draw()
     // Model
     int itModel = glGetUniformLocation(this->program, "modelTransf");
     glUniformMatrix4fv(itModel, 1, false, &(this->modelTransf[0][0]));
+    int itModelRotation = glGetUniformLocation(this->program, "modelRotationTransf");
+    glUniformMatrix4fv(itModelRotation, 1, false, &(this->modelRotationTransf[0][0]));
 
     glDrawArrays(GL_TRIANGLES, 0, this->nTriangles * 3);
 
@@ -119,7 +141,8 @@ void Figure::calculateModeTransf()
     glm::tmat4x4<float> rotationTransfY     = glm::rotate(identityMatrix, degreesToRadians(this->rotation.y), glm::vec3(0.,1.,0.));
     glm::tmat4x4<float> rotationTransfZ     = glm::rotate(identityMatrix, degreesToRadians(this->rotation.z), glm::vec3(0.,0.,1.));
     glm::tmat4x4<float> scaleTransf         = glm::scale(identityMatrix, this->scale);
-    this->modelTransf = translationTransf*rotationTransfX*rotationTransfY*rotationTransfZ*scaleTransf;
+    this->modelRotationTransf = rotationTransfX*rotationTransfY*rotationTransfZ;
+    this->modelTransf = translationTransf*this->modelRotationTransf*scaleTransf;
 }
 
 Figure::~Figure()

@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1508422258 source:c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\library.cpp
+1512079796 source:c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\library.cpp
 	"library.h"
 	<iostream>
 	<fstream>
@@ -7,13 +7,14 @@
 	<vector>
 	<set>
 	<cstdlib>
+	<cmath>
 	<glad/glad.h>
 	<glm/gtc/matrix_transform.hpp>
 	<glm/glm.hpp>
 	<glm/gtx/transform.hpp>
 	<GLFW/glfw3.h>
 
-1508411699 c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\library.h
+1512079788 c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\library.h
 	<vector>
 	<string>
 	<glad/glad.h>
@@ -528,7 +529,7 @@
 
 1502885724 c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\glm-0.9.8.5\glm\gtx\transform.inl
 
-1508422887 source:c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\main.cpp
+1515003248 source:c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\main.cpp
 	<iostream>
 	<fstream>
 	<sstream>
@@ -571,11 +572,11 @@
 	<windows.h>
 	<dlfcn.h>
 
-1508422921 source:c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\primitives\figure.cpp
+1515003468 source:c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\primitives\figure.cpp
 	"Figure.h"
 	<iostream>
 
-1508412954 c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\primitives\figure.h
+1512059615 c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\primitives\figure.h
 	"../library.h"
 	<string>
 
@@ -603,7 +604,7 @@
 	<inttypes.h>
 	<stdint.h>
 
-1509966859 source:c:\users\eddossan\documents\github\shading\library.cpp
+1510250948 source:c:\users\eddossan\documents\github\shading\library.cpp
 	"library.h"
 	<iostream>
 	<fstream>
@@ -1117,15 +1118,15 @@
 
 1502882124 c:\users\eddossan\documents\github\glm-0.9.8.5\glm\gtx\transform.inl
 
-1509964113 source:c:\users\eddossan\documents\github\shading\primitives\figure.cpp
+1510250650 source:c:\users\eddossan\documents\github\shading\primitives\figure.cpp
 	"Figure.h"
 	<iostream>
 
-1509956346 c:\users\eddossan\documents\github\shading\primitives\figure.h
+1510236399 c:\users\eddossan\documents\github\shading\primitives\figure.h
 	"../library.h"
 	<string>
 
-1509966735 source:c:\users\eddossan\documents\github\shading\main.cpp
+1510252055 source:c:\users\eddossan\documents\github\shading\main.cpp
 	<iostream>
 	<fstream>
 	<sstream>
@@ -1138,4 +1139,76 @@
 	<glm/glm.hpp>
 	<glm/gtx/transform.hpp>
 	"primitives/Figure.h"
+
+1510050206 c:\users\eddossan\documents\github\shading\glad4.0\include\glad\glad.h
+	<windows.h>
+	<stddef.h>
+	<KHR/khrplatform.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1510050206 c:\users\eddossan\documents\github\shading\glad4.0\include\khr\khrplatform.h
+	<stdint.h>
+	<inttypes.h>
+	<stdint.h>
+
+1510050206 source:c:\users\eddossan\documents\github\shading\glad4.0\src\glad.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<glad/glad.h>
+	<windows.h>
+	<dlfcn.h>
+
+1510050570 c:\users\eddossan\documents\github\shading\glad_gl4.3\include\glad\glad.h
+	<windows.h>
+	<stddef.h>
+	<KHR/khrplatform.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1510050570 c:\users\eddossan\documents\github\shading\glad_gl4.3\include\khr\khrplatform.h
+	<stdint.h>
+	<inttypes.h>
+	<stdint.h>
+
+1510050570 source:c:\users\eddossan\documents\github\shading\glad_gl4.3\src\glad.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<glad/glad.h>
+	<windows.h>
+	<dlfcn.h>
+
+1512041781 source:c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\glad_gl4.3\src\glad.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<glad/glad.h>
+	<windows.h>
+	<dlfcn.h>
+
+1512041781 c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\glad_gl4.3\include\glad\glad.h
+	<windows.h>
+	<stddef.h>
+	<KHR/khrplatform.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1512041781 c:\users\edwyn luis\documents\lyon\gamagora\shading\projetos\sh_tp01\glad_gl4.3\include\khr\khrplatform.h
+	<stdint.h>
+	<inttypes.h>
+	<stdint.h>
 

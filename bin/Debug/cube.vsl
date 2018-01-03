@@ -1,4 +1,4 @@
-#version 330
+#version 430
 
 layout(location=0) in vec3 position;
 layout(location=1) in vec3 normal;
@@ -7,19 +7,22 @@ layout(location=2) in vec2 uv;
 uniform mat4x4 modelTransf;
 uniform mat4x4 pvTransf;
 
-out vec3 pos;
-out vec2 uvTex;
+out vec3 posOrig;
 out vec3 norm;
+out vec2 uvTex;
 
 void main()
 {
-	//vec4 resTransf = pvTransf*vec4(position.xyz, 1);
-	vec4 resTransf = pvTransf*modelTransf*vec4(position.xyz, 1);
-	vec3 resFinal = vec3(resTransf.xyz/resTransf[3]);
+    // the position and the normal are modified by the model transformation
+    vec4 posModel = modelTransf*vec4(position.xyz, 1);
+    vec4 normalModel = modelTransf*vec4(normal.xyz, 1);
 
-	gl_Position = vec4(resFinal, 1);
-	pos = resFinal;
+    // only the position is modified by the projectionView transformation
+	vec4 posProjView = pvTransf*posModel;
+
+	gl_Position = posProjView;
+	posOrig = posModel.xyz;
+	norm = normalModel.xyz;
 	uvTex = uv;
-	norm = normal;
 }
 
